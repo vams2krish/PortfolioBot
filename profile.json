@@ -1,0 +1,21 @@
+{
+  "name": "Vamshi Krishna Adam",
+  "shortName": "Vamshi",
+  "role": "Builder of useful things & occasional rabbit holes",
+  "email": "adam.vamshikrishnaz@gmail.com",
+  "phone": "+1 475-655-6866",
+  "linkedinUrl": "https://linkedin.com/in/adamvamshikrishna",
+  "githubUrl": "https://github.com/vams2krish",
+  "githubUsername": "vams2krish",
+  "calendlyUrl": "https://calendly.com/adam-vamshikrishna/vamshi-intro-meeting-30-mins-chat",
+  "location": "USA",
+  "bio": "Hi, I’m Vamshi. My public projects explore machine learning, research tools, practical web apps, and the occasional math adventure. I like turning a ‘what if?’ into something you can actually click.",
+  "skills": ["Python", "Machine learning", "Deep learning", "Web applications", "Local AI", "Flutter"],
+  "experience": "Explore the projects below for code, documentation, and the thinking behind each experiment. For my professional background, let’s connect on LinkedIn or have a 30-minute introduction.",
+  "projects": [],
+  "testimonials": [
+    {"quote":"Excellent debugging buddy. Terrible at remembering that I am, in fact, a rubber duck.","name":"Sir Quacks-a-Lot","role":"Fictional desk duck","rating":5,"demo":true},
+    {"quote":"The app works beautifully. Deducted one star because the coffee still needs a human.","name":"The Coffee Committee","role":"Fictional caffeine council","rating":4,"demo":true},
+    {"quote":"Good ideas. Too many tabs. Would happily open another tab together.","name":"Browser Tab #47","role":"Fictional long-term collaborator","rating":3,"demo":true}
+  ]
+}
