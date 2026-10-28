@@ -113,7 +113,7 @@ Questions are standalone; conversation history is not currently sent to the mode
 
 ## GitHub import
 
-The portfolio automatically discovers **all currently public repositories** from `vams2krish`. The current imported snapshot has 29 repositories and 28 available READMEs. The table below highlights the original project collection; the live gallery includes subsequent additions too.
+The portfolio automatically discovers **all currently public repositories** from `vams2krish`. The gallery shows the latest repository total and refresh status. The table below highlights the original project collection; the live gallery includes subsequent additions too.
 
 | Project | Focus |
 | --- | --- |
