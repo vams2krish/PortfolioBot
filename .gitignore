@@ -6,3 +6,4 @@ public/generated/
 *.log
 .DS_Store
 Thumbs.db
+data/github-snapshot.*.tmp

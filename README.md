@@ -12,6 +12,7 @@ A minimal, playful portfolio that combines an illustrated project gallery, a loc
 
 - **Personal introduction:** a human-first hero, about section, skills, contact details, and a smiling digital sidekick.
 - **GitHub project gallery:** all public repositories imported from `vams2krish`, with searchable descriptions, category filters, illustrated covers, detail dialogs, and repository links.
+- **Automatic updates:** the running server refreshes GitHub every five minutes, open browsers update their gallery every minute, and GitHub Actions refreshes the committed snapshot every 30 minutes.
 - **Grounded AI chat:** a local Ollama model answers using retrieved profile information and public GitHub README excerpts. Responses include source labels and repository links.
 - **Discovery-call booking:** meeting and booking questions return a validated Calendly button immediately, without waiting for model inference.
 - **Optional local image generation:** AUTOMATIC1111 can generate an abstract avatar through its Stable Diffusion API. The CSS mascot works without it.
@@ -68,6 +69,8 @@ Set environment variables in the shell before starting the server:
 | `OLLAMA_URL` | `http://127.0.0.1:11434` | Ollama API base URL |
 | `OLLAMA_MODEL` | Automatic local selection | Override the chat model |
 | `AUTOMATIC1111_URL` | `http://127.0.0.1:7860` | AUTOMATIC1111 API base URL |
+| `GITHUB_AUTO_SYNC` | `true` | Set to `false` to disable the running server's GitHub refresh |
+| `GITHUB_SYNC_INTERVAL_SECONDS` | `300` | Runtime refresh interval, with a minimum of 60 seconds |
 
 PowerShell example:
 
@@ -110,7 +113,7 @@ Questions are standalone; conversation history is not currently sent to the mode
 
 ## GitHub import
 
-The initial snapshot contains **11 public repositories and 10 available READMEs**:
+The portfolio automatically discovers **all currently public repositories** from `vams2krish`. The current imported snapshot has 29 repositories and 28 available READMEs. The table below highlights the original project collection; the live gallery includes subsequent additions too.
 
 | Project | Focus |
 | --- | --- |
@@ -126,15 +129,23 @@ The initial snapshot contains **11 public repositories and 10 available READMEs*
 | [Boston Housing Regression](https://github.com/vams2krish/Boston-Housing-Price-Linear-Regression) | Linear-regression learning project and interactive predictions |
 | [simple-browser](https://github.com/vams2krish/simple-browser) | Public repository without a published description or README at initial import |
 
-Refresh the snapshot after adding or changing repositories:
+Updates happen automatically:
+
+- **While the app runs:** it checks GitHub on startup and every five minutes. Newly public repositories, descriptions, languages, topics, stars, archived/fork status, push timestamps, and README changes flow into both the gallery and the AI context. Private repositories are excluded, and deleted or newly private repositories disappear after a successful refresh.
+- **While the app is off:** `.github/workflows/sync-portfolio.yml` checks every 30 minutes and commits changed snapshots and cover art to `main`. GitHub may delay scheduled workflows. This keeps the repository ready for the next clone or deployment; it does not start your local server or pull commits into an existing checkout.
+- **In an open browser:** the gallery checks the server every minute and when the tab becomes visible. Active filters and searches are preserved.
+
+Changes usually appear within about six minutes while the app is running, plus network/import time. This uses polling rather than instant GitHub webhooks. The knowledge base includes repository metadata and README text, not an index of every source file.
+
+To refresh immediately:
 
 ```bash
 npm run sync:github
 ```
 
-The script follows every public-repository page, fetches available README files, and regenerates local SVG cover art. Public GitHub API rate limits apply; no token is required. Data is saved locally so the website does not need GitHub availability for each visitor request. README imports are capped at 16,000 characters per repository.
+The shared sync service follows every public-repository page, fetches available README files, and regenerates local SVG cover art. Public GitHub API rate limits apply; no personal token is required. Data is saved in the single `data/github-snapshot.json` file. New covers are prepared first, then the snapshot is replaced atomically so requests see a complete version. On GitHub failure, timeout, or rate limiting, the last successful snapshot remains available. Refreshes are deduplicated within the server, and retries respect GitHub's rate-limit reset time. README imports are capped at 16,000 characters per repository.
 
-This snapshot predates the PortfolioBot repository itself. Run the sync command after publication to include PortfolioBot too. Refreshing snapshots is an explicit command, not a background monitor.
+The workflow commits only when imported content changes. PortfolioBot's own push timestamp is excluded to prevent a loop of commits caused by the sync bot itself. The workflow uses the repository's built-in Actions token for commits; it does not store a personal GitHub credential. Check its run history under the repository's **Actions** tab, or run it manually with **Run workflow**.
 
 ## Make it your own
 
@@ -144,7 +155,7 @@ Edit `profile.json` to update:
 - Email, phone number, LinkedIn, GitHub, and HTTPS Calendly link.
 - Additional manually curated projects and reviews.
 
-The server reads profile and snapshot data on each request; reload the browser after changing them. Edit `github.mjs` for curated project summaries, categories, ordering, and image paths. Update `public/style.css` and `public/playful.css` for layout and visual styling.
+The server reads profile and snapshot data on each request. The gallery updates automatically after successful syncs; reload for manual biography or contact edits. Edit `github.mjs` for categories, ordering, and fallback descriptions. Current GitHub descriptions take precedence over curated fallback descriptions. Update `public/style.css` and `public/playful.css` for layout and visual styling. Restart the server after changing the GitHub username or environment settings.
 
 For a real approved testimonial, use:
 
@@ -190,10 +201,10 @@ PortfolioBot/
 ├── server.mjs                 # Local HTTP server and model integrations
 ├── retrieval.mjs              # Source documents, chunking, ranking, booking validation
 ├── github.mjs                 # GitHub snapshot loading and gallery summaries
+├── github-sync.mjs            # Automatic refresh, safe snapshot replacement, retries
 ├── profile.json               # Personal details and editable content
 ├── data/
-│   ├── github-projects.json   # Public repository metadata snapshot
-│   └── github-readmes.json    # README text for retrieval
+│   └── github-snapshot.json   # Public metadata and README text in one snapshot
 ├── public/
 │   ├── index.html             # Portfolio and chat interface
 │   ├── app.js                 # Gallery, filters, dialogs, and chat interactions
@@ -213,7 +224,7 @@ PortfolioBot/
 npm test
 ```
 
-Seven automated tests cover relevant source ranking, README retrieval and links, complete project-list retrieval, exclusion of fictional reviews, booking intent, Calendly URL validation, and cover/knowledge coverage for every imported repository.
+Automated tests cover source ranking, README retrieval and links, complete project-list retrieval, exclusion of fictional reviews, booking intent, Calendly URL validation, cover/knowledge coverage, paginated discovery, changed/new/removed/private repositories, unchanged snapshots, failed imports, overlapping refreshes, and rate-limit backoff.
 
 Development checks also verified a live Ollama response about ResearchPal, the booking response, and page/asset requests. Browser checks verified all 11 gallery cards, the AI-tools category filter, and no horizontal overflow at a 390px mobile viewport. Screenshots above come from the running local app.
 

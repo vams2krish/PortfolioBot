@@ -1,0 +1,38 @@
+name: Refresh public GitHub portfolio
+
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: portfolio-github-sync
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch public repositories and READMEs
+        run: npm run sync:github
+      - name: Validate updated portfolio
+        run: npm test
+      - name: Save changed snapshots and cover art
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/github-snapshot.json public/assets/projects/
+          if git diff --cached --quiet; then
+            echo 'Portfolio is already current.'
+          else
+            git commit -m 'Refresh public GitHub portfolio'
+            git push
+          fi

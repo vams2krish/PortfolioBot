@@ -1,9 +1,7 @@
 import {readFile} from 'node:fs/promises';
 const root=new URL('./',import.meta.url);
 export async function githubSnapshot(){
- const data=JSON.parse(await readFile(new URL('data/github-projects.json',root),'utf8'));
- let readmes={};try{readmes=JSON.parse(await readFile(new URL('data/github-readmes.json',root),'utf8'));}catch{}
- return {...data,projects:data.projects.map(p=>({...p,readme:readmes[p.name]||''}))};
+ return JSON.parse(await readFile(new URL('data/github-snapshot.json',root),'utf8'));
 }
 const notes={
  'ResearchPal':['AI & tools','A local research-paper companion with section breakdowns, paper chat, cross-paper synthesis, and spaced-repetition flashcards.','📚'],
@@ -20,5 +18,5 @@ const notes={
 };
 export function portfolioProjects(snapshot){
  const featured=['ResearchPal','MathBlitz','ClariSEE','PDRides'];
- return snapshot.projects.map((p,i)=>{const n=notes[p.name]||['Experiments',p.description||'Explore this public repository on GitHub.','✳'];return {title:p.name,category:n[0],description:n[1],image:`/assets/projects/${p.name}.svg`,imageLabel:'Illustrated project cover',tags:[p.language,...p.topics].filter(Boolean),url:p.url,readme:p.readme,stars:p.stars,fork:p.fork,archived:p.archived,symbol:n[2],order:featured.includes(p.name)?featured.indexOf(p.name):10+i};}).sort((a,b)=>a.order-b.order);
+ return snapshot.projects.map((p,i)=>{const n=notes[p.name]||['Experiments','Explore this public repository on GitHub.','✳'];const excerpt=(p.readme||'').replace(/<!--[\s\S]*?-->/g,'').split(/\n\s*\n/).find(s=>!/^\s*[#<\[!|`]/.test(s)&&s.trim().length>35)?.replace(/[*_`]/g,'').replace(/\s+/g,' ').trim().slice(0,240);return {title:p.name,category:n[0],description:p.description||excerpt||n[1],image:`/assets/projects/${p.name}.svg`,imageLabel:'Illustrated project cover',tags:[p.language,...(p.topics||[])].filter(Boolean),url:p.url,readme:p.readme,stars:p.stars,fork:p.fork,archived:p.archived,pushedAt:p.pushedAt,symbol:n[2],order:featured.includes(p.name)?featured.indexOf(p.name):10+i};}).sort((a,b)=>a.order-b.order);
 }

@@ -4,10 +4,14 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {retrieve,bookingIntent,validBooking} from './retrieval.mjs';
 import {githubSnapshot,portfolioProjects} from './github.mjs';
+import {createGitHubSync} from './github-sync.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const OLLAMA=(process.env.OLLAMA_URL||'http://127.0.0.1:11434').replace(/\/$/,'');
 const A1111=(process.env.AUTOMATIC1111_URL||'http://127.0.0.1:7860').replace(/\/$/,'');
-const profile=async()=>{const p=JSON.parse(await readFile(path.join(root,'profile.json'),'utf8'));const snapshot=await githubSnapshot();return {...p,projects:[...p.projects,...portfolioProjects(snapshot)],githubSyncedAt:snapshot.syncedAt};};
+const settings=JSON.parse(await readFile(path.join(root,'profile.json'),'utf8'));
+const refreshSeconds=Number(process.env.GITHUB_SYNC_INTERVAL_SECONDS||300);
+const githubSync=createGitHubSync({username:settings.githubUsername,intervalMs:Math.max(60,Number.isFinite(refreshSeconds)?refreshSeconds:300)*1000});
+const profile=async()=>{const p=JSON.parse(await readFile(path.join(root,'profile.json'),'utf8'));const snapshot=await githubSnapshot();return {...p,projects:[...p.projects,...portfolioProjects(snapshot)],githubSyncedAt:snapshot.syncedAt,githubSync:githubSync.status()};};
 async function body(req){let data='';for await(const c of req){data+=c;if(data.length>20000)throw Error('Request too large');}return JSON.parse(data||'{}');}
 async function remote(url, options={}, timeout=8000){const r=await fetch(url,{...options,signal:AbortSignal.timeout(timeout)});if(!r.ok)throw Error(`Service returned ${r.status}`);return r.json();}
 function json(res,data,status=200){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
@@ -41,4 +45,4 @@ const server=http.createServer(async(req,res)=>{try{
  const file=path.resolve(root,'public','.'+decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname));if(!file.startsWith(path.join(root,'public')+path.sep))return json(res,{error:'Not found'},404);
  const types={'.html':'text/html','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png'};const data=await readFile(file);res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream','X-Content-Type-Options':'nosniff'});res.end(data);
  }catch(e){json(res,{error:e.code==='ENOENT'?'Not found':'Unable to complete the request. Check the local model service.'},e.code==='ENOENT'?404:502);}});
-server.listen(Number(process.env.PORT)||4175,'127.0.0.1',()=>console.log('Portfolio ready at http://127.0.0.1:'+(process.env.PORT||4175)));
+server.listen(Number(process.env.PORT)||4175,'127.0.0.1',()=>{console.log('Portfolio ready at http://127.0.0.1:'+(process.env.PORT||4175));if(process.env.GITHUB_AUTO_SYNC!=='false')githubSync.start();});
