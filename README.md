@@ -11,7 +11,8 @@ A minimal, playful portfolio that combines an illustrated project gallery, a loc
 ## What it does
 
 - **Personal introduction:** a human-first hero, about section, skills, contact details, and a smiling digital sidekick.
-- **GitHub project gallery:** all public repositories imported from `vams2krish`, with searchable descriptions, category filters, illustrated covers, detail dialogs, and repository links.
+- **GitHub project gallery:** all public repositories imported from `vams2krish`, with searchable descriptions, category filters, actual repository images, detail galleries, and repository links.
+- **Ask about a project:** each card and detail popup has an **Ask my AI Avatar** button. It opens the chat, automatically asks for an explanation, and scopes retrieval and follow-up questions to that project's README. Clear the project context to return to general portfolio questions.
 - **Automatic updates:** the running server refreshes GitHub every five minutes, open browsers update their gallery every minute, and GitHub Actions refreshes the committed snapshot every 30 minutes.
 - **Grounded AI chat:** a local Ollama model answers using retrieved profile information and public GitHub README excerpts. Responses include source labels and repository links.
 - **Discovery-call booking:** meeting and booking questions return a validated Calendly button immediately, without waiting for model inference.
@@ -22,7 +23,18 @@ A minimal, playful portfolio that combines an illustrated project gallery, a loc
 
 ## Project photos
 
-These are screenshots of the running application. Individual gallery covers are original illustrations, not screenshots of those separate projects.
+These are screenshots of the running application. In the live gallery, project images come from public GitHub READMEs and can include screenshots, charts, sample outputs, and diagrams. Projects without a usable image show a labeled illustrated cover instead.
+
+The sync checks Markdown and HTML image references, resolves repository-relative paths, and validates image availability. Badges, logos, comments, unrelated external hosts, and broken images are excluded. Up to four images per repository appear in its detail popup; click a thumbnail to change the large preview. Image discovery runs with every automatic GitHub refresh. Images load directly from their GitHub URLs, with local illustrated fallbacks if loading fails.
+
+![Project showcase with source images and Ask my AI Avatar buttons](docs/assets/project-showcase.png)
+
+<details>
+<summary>Project explanation in the AI avatar chat</summary>
+
+![AI avatar chat opened from a project card with project-specific sources](docs/assets/project-avatar-chat.png)
+
+</details>
 
 <details>
 <summary>Full desktop page</summary>

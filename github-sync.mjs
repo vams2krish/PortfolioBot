@@ -1,5 +1,6 @@
 import {readFile,writeFile,mkdir,rename,rm} from 'node:fs/promises';
 import {createCovers} from './scripts/create-covers.mjs';
+import {findProjectImages} from './project-images.mjs';
 
 const root=new URL('./',import.meta.url);
 const headers={'User-Agent':'PortfolioBot','Accept':'application/vnd.github+json'};
@@ -25,7 +26,8 @@ export async function collectGitHub(username,{fetchImpl=fetch,previous=null}={})
     if(r.ok){readme=(await r.text()).slice(0,16000);break;}
     if(r.status!==404)throw Error(`README refresh failed (${r.status}); keeping the last successful snapshot.`);
    }
-   projects.push({...project,readme});
+   const images=await findProjectImages(username,{...project,readme},fetchImpl);
+   projects.push({...project,readme,images});
   }
   if(repos.length<100)break;
  }

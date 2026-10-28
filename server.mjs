@@ -25,7 +25,9 @@ const server=http.createServer(async(req,res)=>{try{
  }
  if(req.method==='POST'&&url.pathname==='/api/chat'){
   const b=await body(req);const question=String(b.message||'').trim();if(!question||question.length>2000)return json(res,{error:'Enter a question under 2,000 characters.'},400);
-  const p=await profile();const context=retrieve(question,p);const booking=bookingIntent(question);
+  const p=await profile();const projectTitle=typeof b.project==='string'?b.project:null;
+  if(projectTitle&&!p.projects.some(project=>project.title===projectTitle))return json(res,{error:'This project is no longer in the public portfolio. Please refresh the page.'},400);
+  const context=retrieve(question,p,projectTitle);const booking=bookingIntent(question);
   if(booking&&validBooking(p.calendlyUrl)&&/\b(book|booking|call|meet|meeting|discovery|contact)\b/i.test(question))return json(res,{reply:`Let’s get you to the actual human. Book a 30-minute introduction with ${p.shortName||p.name} using the Calendly button below. You can also email ${p.email}${p.phone?` or call ${p.phone}`:''}. Bring your idea; no slides required.`,sources:['Contact and booking'],bookingUrl:p.calendlyUrl,mode:'retrieval'});
   try{
    const tags=await remote(`${OLLAMA}/api/tags`);const localModels=tags.models?.filter(m=>!m.remote_host&&!m.remote_model&&!/(cloud|embed|ocr|vision)/i.test(m.name))||[];const model=process.env.OLLAMA_MODEL||localModels.find(m=>m.name==='llama3.2:latest')?.name||localModels.find(m=>m.name==='qwen2.5:7b')?.name||localModels[0]?.name;

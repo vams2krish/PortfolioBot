@@ -12,10 +12,13 @@ export function documents(profile) {
     {source:'Review disclosure',text:'The homepage reviews by fictional characters are playful demo content, not real client testimonials or endorsements.'}
   ];
 }
-export function retrieve(question, profile) {
+export function retrieve(question, profile, projectTitle=null) {
   const stop=new Set(['the','are','about','what','your','you','can','tell','with','and','for','have','does','how','his','her','this','that']);
   const words = [...new Set(question.toLowerCase().match(/[a-z0-9]+/g)||[])].filter(w=>w.length>2&&!stop.has(w));
-  return documents(profile).map((d,i)=>({...d,score:words.reduce((n,w)=>n+(d.text.toLowerCase().includes(w)?1:0)+(d.source.toLowerCase().includes(w)?3:0),0),i})).sort((a,b)=>b.score-a.score||a.i-b.i).slice(0,5).map(({source,text,url})=>({source,text,url}));
+  const sources=documents(profile).filter(d=>!projectTitle||d.source===`Project: ${projectTitle}`||d.source.startsWith(`${projectTitle} README · `));
+  const ranked=sources.map((d,i)=>({...d,score:words.reduce((n,w)=>n+(d.text.toLowerCase().includes(w)?1:0)+(d.source.toLowerCase().includes(w)?3:0),0),i})).sort((a,b)=>b.score-a.score||a.i-b.i);
+  const summary=projectTitle?sources.find(d=>d.source===`Project: ${projectTitle}`):null;
+  return (summary?[summary,...ranked.filter(d=>d.source!==summary.source)]:ranked).slice(0,5).map(({source,text,url})=>({source,text,url}));
 }
 export function bookingIntent(question) { return /\b(book|booking|call|meet|meeting|hire|collaborat\w*|discovery|availability|available|work together|contact)\b/i.test(question); }
 export function validBooking(url) { try {const u=new URL(url);return u.protocol==='https:' && (u.hostname==='calendly.com'||u.hostname.endsWith('.calendly.com'));}catch{return false;} }
