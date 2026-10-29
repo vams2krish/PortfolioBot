@@ -1,6 +1,7 @@
 import {readFile,writeFile,mkdir,rename,rm} from 'node:fs/promises';
 import {createCovers} from './scripts/create-covers.mjs';
 import {findProjectImages} from './project-images.mjs';
+import {discoverProjectLinks,checkProjectLinks} from './project-links.mjs';
 
 const root=new URL('./',import.meta.url);
 const headers={'User-Agent':'PortfolioBot','Accept':'application/vnd.github+json'};
@@ -17,7 +18,7 @@ export async function collectGitHub(username,{fetchImpl=fetch,previous=null}={})
   if(!Array.isArray(repos))throw Error('Unexpected GitHub repository response');
   for(const p of repos.filter(p=>p.private===false&&p.owner?.login?.toLowerCase()===username.toLowerCase())){
    if(!/^[a-z\d_.-]+$/i.test(p.name))throw Error('Unexpected repository name');
-   const project={name:p.name,description:p.description,language:p.language,topics:p.topics||[],url:p.html_url,branch:p.default_branch,stars:p.stargazers_count,fork:p.fork,archived:p.archived};
+   const project={name:p.name,description:p.description,language:p.language,topics:p.topics||[],url:p.html_url,branch:p.default_branch,stars:p.stargazers_count,fork:p.fork,archived:p.archived,homepage:p.homepage||null};
    // Excluding this portfolio's own push time prevents an endless bot-commit cycle.
    if(p.name.toLowerCase()!=='portfoliobot')project.pushedAt=p.pushed_at;
    let readme='';
@@ -27,7 +28,8 @@ export async function collectGitHub(username,{fetchImpl=fetch,previous=null}={})
     if(r.status!==404)throw Error(`README refresh failed (${r.status}); keeping the last successful snapshot.`);
    }
    const images=await findProjectImages(username,{...project,readme},fetchImpl);
-   projects.push({...project,readme,images});
+   const liveLinks=await checkProjectLinks(discoverProjectLinks({...project,readme,owner:username}),fetchImpl);
+   projects.push({...project,readme,images,liveLinks});
   }
   if(repos.length<100)break;
  }

@@ -4,13 +4,14 @@
 
 A minimal, playful portfolio that combines an illustrated project gallery, a local retrieval-augmented AI chat, and a direct path to a real conversation. Visitors can explore public GitHub projects, ask questions grounded in project documentation, or book a 30-minute discovery call.
 
-![PortfolioBot desktop preview: a playful personal portfolio with a smiling AI sidekick](docs/assets/portfolio-hero.png)
+![PortfolioBot desktop preview featuring Vamshi Krishna Adam’s headshot](docs/assets/portfolio-hero.png)
 
 [Meet the builder](https://linkedin.com/in/adamvamshikrishna) · [Explore the code](https://github.com/vams2krish) · [Book a 30-minute hello](https://calendly.com/adam-vamshikrishna/vamshi-intro-meeting-30-mins-chat)
 
 ## What it does
 
-- **Personal introduction:** a human-first hero, about section, skills, contact details, and a smiling digital sidekick.
+- **Personal introduction:** a human-first hero featuring Vamshi’s supplied headshot, about section, skills, contact details, and an AI chat sidekick. The portrait is cropped responsively with CSS; the source photo is preserved.
+- **Project destinations:** every project has a source link. Published homepage and README URLs add app, hosted-preview, or Colab notebook links to cards and detail dialogs. Owner-private previews are labeled as requiring sign-in; no deployment is invented for source-only projects.
 - **GitHub project gallery:** all public repositories imported from `vams2krish`, with searchable descriptions, category filters, actual repository images, detail galleries, and repository links.
 - **Ask about a project:** each card and detail popup has an **Ask my AI Avatar** button. It opens the chat, automatically asks for an explanation, and scopes retrieval and follow-up questions to that project's README. Clear the project context to return to general portfolio questions.
 - **Automatic updates:** the running server refreshes GitHub every five minutes, open browsers update their gallery every minute, and GitHub Actions refreshes the committed snapshot every 30 minutes.
@@ -26,6 +27,8 @@ A minimal, playful portfolio that combines an illustrated project gallery, a loc
 These are screenshots of the running application. In the live gallery, project images come from public GitHub READMEs and can include screenshots, charts, sample outputs, and diagrams. Projects without a usable image show a labeled illustrated cover instead.
 
 The sync checks Markdown and HTML image references, resolves repository-relative paths, and validates image availability. Badges, logos, comments, unrelated external hosts, and broken images are excluded. Up to four images per repository appear in its detail popup; click a thumbnail to change the large preview. Image discovery runs with every automatic GitHub refresh. Images load directly from their GitHub URLs, with local illustrated fallbacks if loading fails.
+
+App links are imported from GitHub's repository homepage field and explicit deployment links in READMEs. Recognized hosts include Vercel, Heroku, Netlify, Render, Railway, Streamlit, GitHub Pages, and Sites. Known public deployment hosts are checked for an HTTP response: missing or failed deployments remain clickable but are marked **Currently unavailable**. A successful response is an availability check, not a complete product test. Private previews retain their existing access controls. Replace `public/assets/vamshi-headshot.jpg` to update the portrait; the original image is positioned with CSS in `public/portrait.css`.
 
 ![Project showcase with source images and Ask my AI Avatar buttons](docs/assets/project-showcase.png)
 
@@ -191,9 +194,9 @@ Start AUTOMATIC1111 with API access enabled (`--api`) and a checkpoint selected,
 Invoke-RestMethod -Method Post http://127.0.0.1:4175/api/avatar
 ```
 
-The endpoint requests a 512×512 abstract image, saves it to `public/generated/avatar.png`, and returns its local URL. Refresh the portfolio to display it. Generated images are ignored by Git. This creates abstract avatar artwork, not a portrait of Vamshi.
+The endpoint requests a 512×512 abstract image, saves it to `public/generated/avatar.png`, and returns its local URL. Generated images are ignored by Git. This creates abstract artwork, not a portrait of Vamshi. The homepage now keeps the supplied real headshot as its primary image; generating abstract artwork does not replace it.
 
-The included screenshots show the CSS sidekick. The AUTOMATIC1111 integration is implemented, but live generation has not been verified because the service was offline during development.
+The current hero screenshot shows Vamshi’s supplied headshot; some earlier screenshots retain the original CSS sidekick. The AUTOMATIC1111 integration is implemented, but live generation has not been verified because the service was offline during development.
 
 ## API reference
 

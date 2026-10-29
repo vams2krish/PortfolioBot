@@ -4,6 +4,10 @@ let category='All';
 let activeProject=null,selectedProject=null,activeRequest=null,chatOrigin=null;
 const safeLink=url=>{try{const u=new URL(url);return ['https:','http:'].includes(u.protocol)?u.href:null;}catch{return null;}};
 function el(tag,text,className){const n=document.createElement(tag);if(text)n.textContent=text;if(className)n.className=className;return n;}
+function projectLinks(project,container){
+ for(const live of project.liveLinks||[]){const href=safeLink(live.url);if(!href)continue;const a=el('a',live.type==='notebook'?'Open notebook ↗':live.access==='owner-private'?'Open preview ↗':live.availability==='unavailable'?'Deployment link ↗':'Open app ↗','live-project');a.href=href;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',`${a.textContent.replace(' ↗','')} — ${project.title}`);if(live.access==='owner-private'){a.title='Owner sign-in required';a.append(el('span','Owner sign-in required','access-note'));}else if(live.availability==='unavailable')a.append(el('span','Currently unavailable','access-note'));container.append(a);}
+ if(!project.liveLinks?.length)container.append(el('span','No hosted demo listed','source-only'));
+}
 function renderProjects(){
  const query=$('#project-search').value.toLowerCase().trim();
  const filtered=profile.projects.filter(p=>(category==='All'||p.category===category)&&`${p.title} ${p.description} ${p.tags.join(' ')}`.toLowerCase().includes(query));
@@ -14,7 +18,7 @@ function renderProjects(){
   const imageType=el('span',p.images?.length?'From GitHub':'Illustrated cover','image-type');
   imageWrap.append(img,imageType,el('span','↗','project-arrow'));button.append(imageWrap,el('div',p.category,'eyebrow'),el('h3',p.title.replace(/-/g,' ')));article.append(button,el('p',p.description));
   const tags=el('div',null,'tags');p.tags.forEach(t=>tags.append(el('span',t)));if(p.fork)tags.append(el('span','Fork'));if(p.archived)tags.append(el('span','Archived'));article.append(tags);$('#projects').append(article);
-  const actions=el('div',null,'project-actions');const ask=el('button','☺ Ask my AI Avatar','ask-project');ask.setAttribute('aria-label',`Ask my AI Avatar about ${p.title}`);ask.onclick=()=>explainProject(p);actions.append(ask);const href=safeLink(p.url);if(href){const link=el('a','GitHub ↗','project-source');link.href=href;link.target='_blank';link.rel='noopener noreferrer';actions.append(link);}article.append(actions);
+  const destinations=el('div',null,'project-destinations');projectLinks(p,destinations);article.append(destinations);const actions=el('div',null,'project-actions');const ask=el('button','☺ Ask my AI Avatar','ask-project');ask.setAttribute('aria-label',`Ask my AI Avatar about ${p.title}`);ask.onclick=()=>explainProject(p);actions.append(ask);const href=safeLink(p.url);if(href){const link=el('a','Open project on GitHub ↗','project-source');link.href=href;link.target='_blank';link.rel='noopener noreferrer';actions.append(link);}article.append(actions);
   button.onclick=()=>{selectedProject=p;$('#detail-image').src=img.src;$('#detail-image').alt=img.alt;$('#detail-image').onerror=()=>{$('#detail-image').onerror=null;$('#detail-image').src=p.fallbackImage||'/assets/orbit.svg';};$('#detail-title').textContent=p.title.replace(/-/g,' ');$('#detail-category').textContent=p.category;$('#detail-description').textContent=p.description;const link=safeLink(p.url);$('#detail-link').hidden=!link;if(link){$('#detail-link').href=link;$('#detail-link').textContent='Explore on GitHub ↗';}$('#detail-images').replaceChildren();for(const image of p.images||[]){if(!safeLink(image.url))continue;const thumb=el('button');thumb.setAttribute('aria-label',`View ${image.alt}`);const photo=el('img');photo.src=image.url;photo.alt=image.alt;photo.referrerPolicy='no-referrer';thumb.append(photo);thumb.onclick=()=>{$('#detail-image').src=image.url;$('#detail-image').alt=image.alt;};$('#detail-images').append(thumb);}$('#project-dialog').showModal();};
  });
 }
@@ -49,6 +53,7 @@ $('#clear-project').onclick=()=>{activeProject=null;$('#chat-project').hidden=tr
 $('#detail-ask').onclick=()=>{if(selectedProject)explainProject(selectedProject);};
 $('#year').textContent=new Date().getFullYear();
 $('#close-project').onclick=()=>$('#project-dialog').close();
+$('#project-dialog').addEventListener('toggle',()=>{if($('#project-dialog').open&&selectedProject){$('#detail-live-links').replaceChildren();projectLinks(selectedProject,$('#detail-live-links'));}});
 $('#project-dialog').addEventListener('click',e=>{if(e.target===$('#project-dialog'))$('#project-dialog').close();});
 async function load(){
  profile=await fetch('/api/profile').then(r=>r.json());
@@ -74,4 +79,4 @@ load().catch(()=>{$('#bio').textContent='Could not load the portfolio. Please re
 setInterval(refreshPortfolio,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshPortfolio();});
 fetch('/api/status').then(r=>r.json()).then(s=>{$('#model-status').textContent=s.ollama?'Powered by local Ollama':'Local AI offline';}).catch(()=>$('#model-status').textContent='Local AI offline');
-const generated=new Image();generated.onload=()=>{generated.className='generated-avatar';generated.alt='Locally generated abstract AI avatar';$('#avatar-art').replaceChildren(generated);};generated.src='/generated/avatar.png';
+if($('#avatar-art')){const generated=new Image();generated.onload=()=>{generated.className='generated-avatar';generated.alt='Locally generated abstract AI avatar';$('#avatar-art').replaceChildren(generated);};generated.src='/generated/avatar.png';}
