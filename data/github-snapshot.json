@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-10-30T00:27:11.159Z",
+  "syncedAt": "2026-10-30T06:30:25.729Z",
   "owner": "vams2krish",
   "projects": [
     {
@@ -62,22 +62,6 @@
           "alt": "Example input: printed English text about animal coloration"
         }
       ],
-      "liveLinks": []
-    },
-    {
-      "name": "ClariSEE",
-      "description": null,
-      "language": "Dart",
-      "topics": [],
-      "url": "https://github.com/vams2krish/ClariSEE",
-      "branch": "main",
-      "stars": 0,
-      "fork": false,
-      "archived": false,
-      "homepage": null,
-      "pushedAt": "2026-03-12T20:25:51Z",
-      "readme": "# ClariSEE 🖼️✨\n\n[![Flutter](https://flutter.dev/images/flutter/logo/120x120.png)](https://flutter.dev) [![Supabase](https://supabase.com/images/brand/supabase-logo.svg)](https://supabase.com) [![Riverpod](https://raw.githubusercontent.com/rrousselGit/riverpod/master/assets/logo.png)](https://riverpod.dev) [![GoRouter](https://raw.githubusercontent.com/flutter/packages/main/go_router/docs/logo.png)](https://pub.dev/packages/go_router)\n\n**AI Powered Transform any text into interactive diagrams, quizzes, summaries & insights using advanced NLP. ChatGPT-style UI with token economy, subscriptions, and PostgreSQL backend.**\n\n⭐ **Top Features:**\n- 📊 **Multi-Diagram Gen**: Flowcharts, Mind Maps, UML, ERD, Graphs from text/PDF/DOC/URL (20 tokens).\n- ✅ **Semantic Quiz**: MCQs with scoring from text (15 tokens).\n- 📝 **Smart Summary**: Extractive/Abstractive sliders (5 tokens).\n- 🔍 **NLP Analyzer**: NER, POS tagging, dependency parsing viz (5 tokens).\n- 🔊 **Audio**: TTS voice-over explanations (10 tokens).\n- 💳 **Subscriptions**: Stripe UI token packs.\n- 📈 **Tokens**: 1000 free, deduct on use, history table.\n- 🎨 **Modern UI**: Dark/Light toggle, animations, sounds, feedback, share.\n- 📱 **Multi-Input**: Text, file upload, URL scrape.\n- 🔐 **Auth**: Supabase login/signup/profile pic.\n\n## 🎯 Live Demo\nhttp://localhost:xxxxx (terminal port)\n\n## 🚀 Quick Start\n\n### Prerequisites\n- Flutter 3.10+\n- Chrome\n- Supabase account (free)\n\n### Setup\n```bash\ngit clone <repo>\ncd ClariSEE\nflutter pub get\n```\n\n### Supabase\n1. [supabase.com](https://supabase.com) → New Project\n2. Copy URL/anon key → lib/main.dart\n3. SQL Editor → tables:\n```sql\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n\nCREATE TABLE users (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  email TEXT UNIQUE NOT NULL,\n  password TEXT,\n  username TEXT,\n  profile_pic TEXT,\n  tokens INTEGER DEFAULT 1000\n);\n\nCREATE TABLE history (\n  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n  user_id UUID REFERENCES users(id),\n  timestamp TIMESTAMPTZ DEFAULT NOW(),\n  type TEXT,\n  tokens_used INTEGER\n);\n\n-- RLS policies for security\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\nCREATE POLICY \"Users can view own profile\" ON users FOR SELECT USING (auth.uid() = id);\n```\n\n### Run\n```bash\nflutter run -d chrome\n```\n\n**Port:** localhost:xxxxx → black/white landing.\n\n## 🏗️ Architecture\n\n```\nFrontend: Flutter Web\n├── State: Riverpod (auth, tokens)\n├── Routing: GoRouter\n├── UI: Material3, Lottie anim, dark toggle\n├── Services: Supabase CRUD, NLP rule-based\n└── Widgets: Input, diagram viewer, quiz, charts (Syncfusion)\n\nBackend: Supabase PostgreSQL\n├── Auth: Email/password + profile\n├── DB: users/tokens/history (RLS security)\n└── APIs: realtime tokens/history\n\nNLP Core (Client-side):\n- NER/POS: Regexp + keywords\n- Diagram: Text→Graphviz DOT→SVG\n- Quiz: Sentence split → options\n- Summary: Extractive (sentences), abstractive (mock)\n```\n\n## 📱 Screenshots\n\n| Landing | Dashboard Diagram | Quiz | Analyzer |\n|---------|------------------|------|----------|\n| ![Landing](screenshots/landing.png) | ![Diagram](screenshots/diagram.png) | ![Quiz](screenshots/quiz.png) | ![Analyzer](screenshots/analyzer.png) |\n\n## 🔧 Features Detail\n\n### Input Sources\n- Text area\n- File picker (PDF/DOC/TXT → text extract)\n- URL → HTML parse\n\n### Diagram Types\n- Flowchart, Mind Map, UML, Venn, ERD, Graph, Tree\n\n### Token Economy\n| Feature | Tokens |\n|---------|--------|\n| Diagram | 20 |\n| Quiz | 15 |\n| Audio | 10 |\n| Analyzer/Summary | 5 |\n\n### Security\n- Supabase RLS: User-only data\n- Input sanitization\n- Tokens prevent abuse\n- Stripe secure (UI only)\n\n## 🤝 Contributing\n```\nflutter pub get\ncode .\nflutter run\n```\nPRs welcome!\n\n## 📄 License\nMIT\n\n## 🙏 Credits\nBuilt with ❤️\n\n⭐ **Star if useful!** 🚀\n\n",
-      "images": [],
       "liveLinks": []
     },
     {
