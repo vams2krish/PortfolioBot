@@ -22,20 +22,21 @@ Ollama is optional. When available, the local assistant answers using retrieved 
 
 ## Deploy to Vercel
 
-Import this repository using the link above. The project serves static assets from `public/` and API routes from `api/`. Hosted mode uses source excerpts and booking links without connecting to the local Ollama or image server. The hosted snapshot comes from the deployed Git revision; GitHub Actions can refresh it, and a Git-connected deployment picks up subsequent commits.
+Import this repository using the link above. The project serves static assets from `public/` and API routes from `api/`. Hosted mode uses source excerpts and booking links without connecting to the local Ollama or image server. The hosted catalog reads the published snapshot from GitHub, so scheduled data refreshes also reach the live site.
 
 ## Product flows
 
-- Search and filter the gallery; select a project to browse its available images.
+- Search the catalog by project name, description, category, or tags. Combine category, technology, and public demo filters, then sort by recent activity, featured order, or name.
+- Open a project to browse its available screenshots, description, technologies, and links.
 - Open the source repository, a hosted demo, or a notebook when available. Owner-only previews and unavailable endpoints are labeled.
 - Ask the assistant about a selected project. Follow-up questions stay scoped to that project until the scope is cleared.
 - Book a call through Calendly or use the contact links.
 
 ## Design and data
 
-The palette in `public/design.css` uses navy backgrounds, layered slate surfaces, lavender for primary actions, and mint for focus and accents. Shared tokens cover color, spacing, and corner radii. Older styling files provide the base layout. The UI adapts to mobile and respects reduced-motion settings.
+The catalog layout and light palette live in `public/catalog.css`. The gallery uses three columns on desktop, two on tablets, and one on phones.
 
-Personal details are in `profile.json`. Public repository metadata, README excerpts, image references, and deployment links are stored in `data/github-snapshot.json`. The local server can refresh the snapshot on an interval; GitHub Actions maintains the repository copy. When GitHub is unavailable, the last good snapshot remains in use.
+Personal details are in `profile.json`. The GitHub sync collects repository descriptions, languages, topics, READMEs, screenshots referenced in READMEs, and candidates from repository screenshot and documentation folders. It saves up to ten checked image references per project. GitHub Actions maintains the snapshot. Hosted requests cache the current GitHub snapshot for five minutes and use the bundled snapshot as a fallback if the refresh fails.
 
 ## API
 

@@ -10,20 +10,29 @@ function projectLinks(project,container){
 }
 function renderProjects(){
  const query=$('#project-search').value.toLowerCase().trim().replace(/[-_]+/g,' ');
- const filtered=profile.projects.filter(p=>(category==='All'||p.category===category)&&`${p.title} ${p.description} ${p.tags.join(' ')}`.toLowerCase().replace(/[-_]+/g,' ').includes(query));
+ const searchWords=query.split(/\s+/).filter(Boolean);
+ const technology=$('#technology').value;
+ const filtered=profile.projects.filter(p=>(category==='All'||p.category===category)&&(!technology||p.tags.includes(technology))&&(!$('#has-demo').checked||p.liveLinks?.some(link=>link.access==='public'&&link.availability!=='unavailable'))&&searchWords.every(word=>`${p.title} ${p.description} ${p.details||''} ${p.category} ${p.tags.join(' ')}`.toLowerCase().replace(/[-_]+/g,' ').includes(word)));
+ const sort=$('#project-sort').value;
+ if(sort==='name')filtered.sort((a,b)=>a.title.localeCompare(b.title));
+ if(sort==='recent')filtered.sort((a,b)=>(b.pushedAt||'').localeCompare(a.pushedAt||''));
  $('#projects').replaceChildren();$('#project-count').textContent=`${filtered.length} of ${profile.projects.length} projects`;$('#empty-projects').hidden=filtered.length!==0;
  filtered.forEach(p=>{
   const article=el('article',null,'project');const button=el('button');button.setAttribute('aria-label',`Explore ${p.title}`);
-  const imageWrap=el('div',null,'project-image');const img=el('img');img.src=safeLink(p.image)||(p.image?.startsWith('/')?p.image:'/assets/orbit.svg');img.alt=p.imageLabel||`${p.title} project preview`;img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.onerror=null;img.src=p.fallbackImage||'/assets/orbit.svg';img.alt=`${p.title} illustrated cover`;imageType.textContent='Illustrated cover';};
+  const imageWrap=el('div',null,'project-image');const img=el('img');img.src=safeLink(p.image)||(p.image?.startsWith('/')?p.image:'/assets/orbit.svg');img.alt=p.imageLabel||`${p.title} project preview`;img.loading='lazy';img.referrerPolicy='no-referrer';img.onerror=()=>{img.onerror=()=>{img.onerror=null;img.src='/assets/orbit.svg';};img.src=p.fallbackImage||'/assets/orbit.svg';img.alt=`${p.title} illustrated cover`;imageType.textContent='Illustrated cover';};
   const imageType=el('span',p.images?.length?'From GitHub':'Illustrated cover','image-type');
   imageWrap.append(img,imageType,el('span','↗','project-arrow'));button.append(imageWrap,el('div',p.category,'eyebrow'),el('h3',p.title.replace(/-/g,' ')));article.append(button,el('p',p.description));
-  const tags=el('div',null,'tags');p.tags.forEach(t=>tags.append(el('span',t)));if(p.fork)tags.append(el('span','Fork'));if(p.archived)tags.append(el('span','Archived'));article.append(tags);$('#projects').append(article);
+  const tags=el('div',null,'tags');p.tags.slice(0,6).forEach(t=>tags.append(el('span',t)));if(p.fork)tags.append(el('span','Fork'));if(p.archived)tags.append(el('span','Archived'));article.append(tags);$('#projects').append(article);
   const destinations=el('div',null,'project-destinations');projectLinks(p,destinations);article.append(destinations);const actions=el('div',null,'project-actions');const ask=el('button','☺ Ask my AI Avatar','ask-project');ask.setAttribute('aria-label',`Ask my AI Avatar about ${p.title}`);ask.onclick=()=>explainProject(p);actions.append(ask);const href=safeLink(p.url);if(href){const link=el('a','Open project on GitHub ↗','project-source');link.href=href;link.target='_blank';link.rel='noopener noreferrer';actions.append(link);}article.append(actions);
-  button.onclick=()=>{selectedProject=p;$('#detail-image').src=img.src;$('#detail-image').alt=img.alt;$('#detail-image').onerror=()=>{$('#detail-image').onerror=null;$('#detail-image').src=p.fallbackImage||'/assets/orbit.svg';};$('#detail-title').textContent=p.title.replace(/-/g,' ');$('#detail-category').textContent=p.category;$('#detail-description').textContent=p.description;const link=safeLink(p.url);$('#detail-link').hidden=!link;if(link){$('#detail-link').href=link;$('#detail-link').textContent='Explore on GitHub ↗';}$('#detail-images').replaceChildren();for(const image of p.images||[]){if(!safeLink(image.url))continue;const thumb=el('button');thumb.setAttribute('aria-label',`View ${image.alt}`);const photo=el('img');photo.src=image.url;photo.alt=image.alt;photo.referrerPolicy='no-referrer';thumb.append(photo);thumb.onclick=()=>{$('#detail-image').src=image.url;$('#detail-image').alt=image.alt;};$('#detail-images').append(thumb);}$('#project-dialog').showModal();};
+  button.onclick=()=>{selectedProject=p;$('#detail-image').src=img.src;$('#detail-image').alt=img.alt;$('#detail-image').onerror=()=>{$('#detail-image').onerror=null;$('#detail-image').src=p.fallbackImage||'/assets/orbit.svg';};$('#detail-title').textContent=p.title.replace(/-/g,' ');$('#detail-category').textContent=p.category;$('#detail-description').textContent=p.description;$('#detail-extra').textContent=p.details||'';$('#detail-tags').replaceChildren(...p.tags.map(tag=>el('span',tag)));const link=safeLink(p.url);$('#detail-link').hidden=!link;if(link){$('#detail-link').href=link;$('#detail-link').textContent='Explore on GitHub ↗';}$('#detail-images').replaceChildren();for(const image of p.images||[]){if(!safeLink(image.url))continue;const thumb=el('button');thumb.setAttribute('aria-label',`View ${image.alt}`);const photo=el('img');photo.src=image.url;photo.alt=image.alt;photo.referrerPolicy='no-referrer';thumb.append(photo);thumb.onclick=()=>{$('#detail-image').src=image.url;$('#detail-image').alt=image.alt;};$('#detail-images').append(thumb);}$('#project-dialog').showModal();};
  });
 }
 function renderGitHub(){
- const categories=['All',...new Set(profile.projects.map(p=>p.category))];
+ const tech=$('#technology');const current=tech.value;
+ const tags=[...new Set(profile.projects.flatMap(p=>p.tags))].sort((a,b)=>a.localeCompare(b));
+ tech.replaceChildren(new Option('All technologies',''),...tags.map(tag=>new Option(tag,tag)));
+ tech.value=tags.includes(current)?current:'';
+ const categories=['All',...[...new Set(profile.projects.map(p=>p.category))].sort()];
  if(!categories.includes(category))category='All';
  $('#project-filters').replaceChildren();
  for(const label of categories){const b=el('button',label);b.setAttribute('aria-pressed',String(label===category));b.onclick=()=>{category=label;$('#project-filters').querySelectorAll('button').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));renderProjects();};$('#project-filters').append(b);}
@@ -61,7 +70,10 @@ async function load(){
  document.querySelectorAll('[data-name]').forEach(n=>n.textContent=profile.name);$('[data-role]').textContent=profile.role.toLowerCase();
  $('#bio').textContent=profile.bio;$('#experience').textContent=profile.experience;
  profile.skills.forEach(s=>$('#skills').append(el('span',s)));
- $('#project-search').addEventListener('input',renderProjects);renderGitHub();
+ $('#project-search').addEventListener('input',renderProjects);
+ for(const id of ['technology','project-sort','has-demo'])document.getElementById(id).addEventListener('change',renderProjects);
+ $('#clear-filters').onclick=()=>{category='All';$('#project-search').value='';$('#technology').value='';$('#has-demo').checked=false;$('#project-sort').value='recent';renderGitHub();};
+ renderGitHub();
  for(const [label,url] of [['GitHub',profile.githubUrl],['LinkedIn',profile.linkedinUrl]]){const href=safeLink(url);if(href){const a=el('a',`${label} ↗`);a.href=href;a.target='_blank';a.rel='noopener noreferrer';$('#social-links').append(a);}}
  if(profile.phone){const a=el('a',`${profile.phone} (USA)`);a.href=`tel:${profile.phone.replace(/[^+\d]/g,'')}`;$('#social-links').append(a);}
  let valid=false;try{const u=new URL(profile.calendlyUrl);valid=u.protocol==='https:'&&(u.hostname==='calendly.com'||u.hostname.endsWith('.calendly.com'));}catch{}

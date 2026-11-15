@@ -1,6 +1,6 @@
 import {readFile,writeFile,mkdir,rename,rm} from 'node:fs/promises';
 import {createCovers} from './scripts/create-covers.mjs';
-import {findProjectImages} from './project-images.mjs';
+import {findProjectImages,repositoryScreenshotPaths} from './project-images.mjs';
 import {discoverProjectLinks,checkProjectLinks} from './project-links.mjs';
 
 const root=new URL('./',import.meta.url);
@@ -27,9 +27,17 @@ export async function collectGitHub(username,{fetchImpl=fetch,previous=null}={})
     if(r.ok){readme=(await r.text()).slice(0,16000);break;}
     if(r.status!==404)throw Error(`README refresh failed (${r.status}); keeping the last successful snapshot.`);
    }
-   const images=await findProjectImages(username,{...project,readme},fetchImpl);
+   const old=previous?.projects.find(item=>item.name===p.name&&item.branch===p.default_branch);
+   let screenshots=old?.screenshotPaths;
+   if(fetchImpl===fetch&&(!screenshots||old.pushedAt!==project.pushedAt)&&p.name.toLowerCase()!=='portfoliobot'){
+    try{
+     const tree=await (await request(`https://api.github.com/repos/${username}/${p.name}/git/trees/${encodeURIComponent(p.default_branch)}?recursive=1`)).json();
+     if(Array.isArray(tree.tree))screenshots=repositoryScreenshotPaths(tree.tree);
+    }catch{ /* README assets and the previous screenshot inventory remain usable. */ }
+   }
+   const images=await findProjectImages(username,{...project,readme},fetchImpl,screenshots);
    const liveLinks=await checkProjectLinks(discoverProjectLinks({...project,readme,owner:username}),fetchImpl);
-   projects.push({...project,readme,images,liveLinks});
+   projects.push({...project,readme,images,liveLinks,...(screenshots?{screenshotPaths:screenshots}:{})});
   }
   if(repos.length<100)break;
  }

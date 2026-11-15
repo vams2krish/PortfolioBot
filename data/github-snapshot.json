@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-11-15T17:13:32.488Z",
+  "syncedAt": "2026-11-15T19:30:25.374Z",
   "owner": "vams2krish",
   "projects": [
     {
@@ -30,12 +30,13 @@
           "alt": "Project architecture: document inputs, OCR extraction, and language analysis"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": []
     },
     {
       "name": "AI-TextLens-OCR",
       "description": "AI / Computer Vision: TextLens OCR extracts English text from PNG and JPEG images with Python, Streamlit, Pillow, and Tesseract. Includes grayscale previews, sample input, workflow visuals, setup instructions, deployment notes, and troubleshooting.",
-      "language": "Python",
+      "language": "JavaScript",
       "topics": [
         "computer-vision",
         "image-to-text",
@@ -50,19 +51,39 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T21:35:44Z",
-      "readme": "# AI · TextLens OCR\n\n**A Python computer vision app that extracts English text from images using Streamlit, Pillow, and Tesseract OCR.**\n\n![TextLens OCR project overview](docs/project-overview.svg)\n\n## Project summary\n\nTextLens OCR provides a simple browser interface for turning images of printed text into selectable text. Upload a PNG or JPEG, inspect its grayscale preview, and read the text returned by Tesseract. It is useful for experimenting with OCR on screenshots, scanned pages, and clear photographs of text.\n\nThe project belongs to **AI / computer vision**, specifically optical character recognition. It uses the existing Tesseract OCR engine through `pytesseract`; it does not train a custom ML or DL model and does not use generative AI. The repository name follows the requested project-type-plus-project-name convention: **`AI-TextLens-OCR`**.\n\n## Features\n\n- Browser interface built with Streamlit.\n- PNG, JPG, and JPEG uploads.\n- Grayscale conversion and image preview with Pillow.\n- Text recognition through a locally installed Tesseract engine.\n- Extracted text displayed directly on the page.\n- An initial upload prompt before any image processing starts.\n- Windows executable configuration and PATH-based engine discovery on Linux/macOS.\n\n## Project image and sample\n\nThe banner above illustrates the implemented workflow; it is not an application screenshot. The following sample is included so you can try the app immediately:\n\n![Example input: printed English text about animal coloration](docs/example-input.png)\n\nRun the app and upload [`docs/example-input.png`](docs/example-input.png). The output should contain recognizable passages about animal coloration. Exact whitespace and recognition results depend on the Tesseract version and installed language data. This sample is an illustration, not an accuracy benchmark. The image identifies its source as an adaptation of John Lubbock's “The Colors of Animals” in *A Book of Natural History* (1902, edited by David Starr Jordan).\n\n## How it works\n\n1. **Upload:** Streamlit accepts a PNG or JPEG file.\n2. **Load:** Pillow opens the uploaded image.\n3. **Preprocess:** `image.convert('L')` converts it to grayscale.\n4. **Recognize:** `pytesseract.image_to_string(gray_image)` invokes Tesseract.\n5. **Display:** Streamlit shows the grayscale image and extracted text.\n\nProcessing runs on the machine hosting Streamlit. When you run it locally, that machine is your computer. If you deploy the app remotely, uploads are sent to that server for processing. The app code does not explicitly save uploaded images or OCR results to disk.\n\n## Technology stack\n\n| Component | Role |\n| --- | --- |\n| Python | Application language |\n| Streamlit | Upload interface, preview, and text display |\n| Pillow | Image loading and grayscale conversion |\n| pytesseract | Python wrapper around Tesseract |\n| Tesseract OCR | Native text recognition engine |\n\n## Installation\n\n### 1. Clone and create a virtual environment\n\n```bash\ngit clone https://github.com/vams2krish/AI-TextLens-OCR.git\ncd AI-TextLens-OCR\npython -m venv .venv\n```\n\nActivate it on Windows PowerShell:\n\n```powershell\n.\\.venv\\Scripts\\Activate.ps1\n```\n\nOr on Linux/macOS:\n\n```bash\nsource .venv/bin/activate\n```\n\n### 2. Install Tesseract separately\n\nInstalling `pytesseract` does **not** install the native OCR engine.\n\n- **Windows:** Install Tesseract with English language data. The app expects `C:\\Program Files\\Tesseract-OCR\\tesseract.exe`. If your installation is elsewhere, change `pytesseract.pytesseract.tesseract_cmd` in `app.py`.\n- **Ubuntu/Debian:** Install the engine and English data:\n\n  ```bash\n  sudo apt-get update\n  sudo apt-get install tesseract-ocr tesseract-ocr-eng\n  ```\n\n- **macOS with Homebrew:**\n\n  ```bash\n  brew install tesseract\n  ```\n\nOn Linux/macOS, ensure `tesseract` is available on PATH. Check installation and language data with:\n\n```bash\ntesseract --version\ntesseract --list-langs\n```\n\nOn Windows, you can invoke the configured executable directly:\n\n```powershell\n& 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe' --list-langs\n```\n\n### 3. Install Python dependencies\n\n```bash\npython -m pip install -r requirements.txt\n```\n\n### 4. Start the app\n\n```bash\npython -m streamlit run app.py\n```\n\nOpen the local URL printed in your terminal, upload an image, and read or copy the extracted text. Stop the server with `Ctrl+C`.\n\n## Repository layout\n\n```text\nAI-TextLens-OCR/\n├── app.py                     # Streamlit application and OCR pipeline\n├── requirements.txt           # Python dependencies\n├── packages.txt               # Tesseract system package for apt-based hosting\n├── docs/\n│   ├── project-overview.svg   # Workflow illustration\n│   └── example-input.png      # Example English text image\n├── .gitignore\n└── README.md\n```\n\n## Deployment notes\n\nA host needs both the Python dependencies and the native Tesseract executable. `packages.txt` lists `tesseract-ocr` for hosts that support apt packages through this file, such as Streamlit Community Cloud. Ensure English language data is present as well. For a Streamlit deployment, use `app.py` as the entry point. No hosted deployment is claimed by this repository.\n\n## Limitations\n\n- **Images only:** PDF files are not supported by the current app. Convert PDF pages to PNG/JPEG before uploading.\n- **English workflow:** There is no language selector; the OCR call uses Tesseract's default language configuration. Additional language support needs language data and code changes.\n- **Recognition quality varies:** Blur, rotation, low resolution, low contrast, handwriting, and complex layouts can reduce accuracy. Review results before relying on them.\n- **Basic preprocessing:** The app converts to grayscale but does not deskew, denoise, threshold, or detect page layout.\n- **Text output only:** It does not preserve document formatting or table structure, and has no download/export button.\n- **Error handling:** Invalid image contents or OCR engine failures can surface as Streamlit errors.\n- **Reproducibility:** Python dependencies are not pinned, and there is no automated test suite or published accuracy benchmark.\n\n## Troubleshooting\n\n| Problem | What to check |\n| --- | --- |\n| Tesseract not found | Install the native engine; verify the Windows path in `app.py` or PATH on Linux/macOS. |\n| Missing language data | Run `tesseract --list-langs` and ensure `eng` is installed. |\n| Empty or inaccurate text | Try a sharp, upright, high-contrast image containing printed English text. |\n| PDF rejected | Convert its pages to PNG or JPEG first. |\n| Python import failure | Activate the virtual environment and reinstall `requirements.txt` using the same Python interpreter. |\n\n## Possible improvements\n\nFuture work could include PDF page conversion, language selection, image cleanup, configurable OCR modes, text downloads, friendlier error handling, and a repeatable accuracy evaluation. These are ideas rather than implemented features.\n\n## Author and licensing\n\nMaintained by [Vamshi Krishna Adam](https://github.com/vams2krish). This repository does not currently include a project license. Public visibility alone does not grant permission to reuse or redistribute the code. Third-party libraries and sample content retain their respective terms.\n",
+      "pushedAt": "2026-11-15T18:25:53Z",
+      "readme": "# TextLens OCR Studio\n\nTextLens turns images, PDF pages, video frames, and camera snapshots into editable English text. The web app processes your media in the browser, with no account or API key.\n\n**[Open the live app on Vercel](https://ai-textlens-ocr.vercel.app/)**\n\n![TextLens desktop workspace](docs/screens/01-workspace.png)\n\n## What you can open\n\n| Input | What the app does |\n| --- | --- |\n| PNG, JPEG, WebP, GIF, BMP, AVIF | Previews the image and runs English OCR. Animated images use a single frame. HEIC and HEIF require browser decoding support. |\n| PDF | Select a page. TextLens reads the embedded text when present and uses OCR for image-only pages. |\n| MP4, WebM, MOV, M4V, OGV | Preview or seek to a frame and extract visible text. Supported codecs depend on the browser. |\n| Camera | Enable the camera and take a snapshot, or use the device photo picker. Live capture requires HTTPS or localhost and browser permission. |\n| UTF-8 TXT | Opens text for quick edits and export, without OCR. |\n\nChoose a file (or try the built-in sample), review the preview, and select **Extract text**. Edit the result, copy it, or download it as a UTF-8 text file. The app accepts one file at a time, up to 50 MB.\n\n## Product showcase\n\n| Workflow | Preview |\n| --- | --- |\n| Image preview | [Preview an uploaded image](docs/screens/02-image-preview.png) |\n| Image OCR | [Read the extracted text](docs/screens/03-image-ocr.png) |\n| Text editing | [Edit and export plain text](docs/screens/04-editable-text.png) |\n| PDF text | [Choose a PDF page](docs/screens/05-pdf-text.png) |\n| Scanned PDF | [Recognize text from a scanned page](docs/screens/06-scanned-pdf.png) |\n| Camera setup | [Open the camera tab](docs/screens/07-camera-setup.png) |\n| Camera preview | [Frame text before capture](docs/screens/08-camera-live.png) |\n| Camera OCR | [Extract text from a snapshot](docs/screens/09-camera-ocr.png) |\n| Video | [Extract text from a selected video frame](docs/screens/10-video-frame.png) |\n| Mobile | [View the responsive layout](docs/screens/11-mobile.png) |\n\n**Image OCR**\n\n![Uploaded sample and extracted text side by side](docs/screens/03-image-ocr.png)\n\n**PDF page selection**\n\n![PDF preview with page selector and text](docs/screens/05-pdf-text.png)\n\n**Camera snapshot**\n\n![Camera snapshot with recognized English text](docs/screens/09-camera-ocr.png)\n\n**Video frame OCR**\n\n![Video preview and recognized text](docs/screens/10-video-frame.png)\n\nCamera and video screenshots use a simulated camera with sample text.\n\n## Run locally\n\nUse Node.js 22.12+ or 24 LTS:\n\n```bash\nnpm ci\nnpm run dev\n```\n\nOpen the localhost URL printed by Vite. To test the production build locally:\n\n```bash\nnpm run build\nnpm run preview\n```\n\n[Vercel's Vite preset](https://vercel.com/docs/frameworks/frontend/vite) builds the static app with *npm run build* and serves *dist*. No environment variables are required.\n\nThe live deployment was published directly to Vercel. Automatic deployment from GitHub requires connecting the repository to the Vercel project.\n\n## How it works\n\nThe browser decodes images and video and draws the chosen frame to a canvas. [PDF.js](https://mozilla.github.io/pdf.js/) renders the selected page and exposes its text layer. [Tesseract.js](https://github.com/naptha/tesseract.js) uses a WebAssembly worker and bundled English language data to recognize text without sending media to an OCR service. The build copies the OCR assets from pinned dependencies so the worker and model load from the same site as the app.\n\nThe older Streamlit image demo remains available through *app.py*. To run it, install Python dependencies from *requirements.txt*, install native Tesseract with English language data, and run *python -m streamlit run app.py*. For an executable outside PATH or the usual Windows installation, set *TESSERACT_CMD* to its full path.\n\n## Limits and troubleshooting\n\n- OCR works best on sharp, upright, well-lit printed English text. Review results before using them.\n- PDF processing handles one page at a time. Text layers can omit text baked into images on the same page, and layout, tables, and reading order may change. Password-protected PDFs are unsupported.\n- Video processing reads the current frame and does not transcribe audio. For decoding errors, try MP4 with H.264 or a WebM file.\n- If camera permission is denied or no camera is available, try the device photo picker or upload a file. The live camera stops after capture or when switching to file upload.\n\nMaintained by [Vamshi Krishna Adam](https://github.com/vams2krish). The sample image is adapted from John Lubbock's “The Colors of Animals” in *A Book of Natural History* (1902). No project license has been added.\n",
       "images": [
         {
-          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/project-overview.svg",
-          "alt": "TextLens OCR project overview"
+          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/screens/01-workspace.png",
+          "alt": "TextLens desktop workspace"
         },
         {
-          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/example-input.png",
-          "alt": "Example input: printed English text about animal coloration"
+          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/screens/03-image-ocr.png",
+          "alt": "Uploaded sample and extracted text side by side"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/screens/05-pdf-text.png",
+          "alt": "PDF preview with page selector and text"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/screens/09-camera-ocr.png",
+          "alt": "Camera snapshot with recognized English text"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/AI-TextLens-OCR/main/docs/screens/10-video-frame.png",
+          "alt": "Video preview and recognized text"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://ai-textlens-ocr.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": []
     },
     {
       "name": "Attune-Listening-Trainer-GenAI",
@@ -101,9 +122,30 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/Attune-Listening-Trainer-GenAI/main/docs/images/perfect-score.png",
           "alt": "Perfect-score result"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/Attune-Listening-Trainer-GenAI/main/docs/images/attune-overview.png",
+          "alt": "attune overview"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/Attune-Listening-Trainer-GenAI/main/docs/images/live-answer-sheet.png",
+          "alt": "live answer sheet"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/Attune-Listening-Trainer-GenAI/main/docs/images/mobile-setup.png",
+          "alt": "mobile setup"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/attune-overview.png",
+        "docs/images/clear-answer-review.png",
+        "docs/images/live-answer-sheet.png",
+        "docs/images/mobile-setup.png",
+        "docs/images/perfect-score.png",
+        "docs/images/sequential-listening.png",
+        "docs/images/unified-setup.png"
+      ]
     },
     {
       "name": "CV-ML-SpatialSync",
@@ -142,6 +184,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/CV-ML-SpatialSync/main/docs/images/03-capture-replay.png",
           "alt": "Running RGB frame replay using the simulated browser test camera"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/CV-ML-SpatialSync/main/docs/images/04-shared-session.png",
+          "alt": "Running shared-session workspace after a synthetic map snapshot is synchronized"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/CV-ML-SpatialSync/main/docs/images/05-mobile.png",
+          "alt": "Running workspace at a 390-pixel mobile viewport with synthetic geometry"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/CV-ML-SpatialSync/main/docs/images/06-live-demo.png",
+          "alt": "Public GitHub Pages production demo after aligning the synthetic studio map"
         }
       ],
       "liveLinks": [
@@ -151,6 +205,14 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/images/01-workspace.png",
+        "docs/images/02-alignment.png",
+        "docs/images/03-capture-replay.png",
+        "docs/images/04-shared-session.png",
+        "docs/images/05-mobile.png",
+        "docs/images/06-live-demo.png"
       ]
     },
     {
@@ -182,6 +244,30 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/03-cockpit-rain-night.png",
           "alt": "Cockpit rain at night"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/04-store-wait.png",
+          "alt": "Store wait workflow"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/05-photo-proof.png",
+          "alt": "Delivery photo proof"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/06-run-complete.png",
+          "alt": "Completed delivery payout"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/07-mobile-driving.png",
+          "alt": "Mobile driving controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/docs/showcase/08-wheel-mode-mobile.png",
+          "alt": "08 wheel mode mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DashEats/main/public/assets/blender/asset-showcase.png",
+          "alt": "asset showcase"
         }
       ],
       "liveLinks": [
@@ -191,6 +277,17 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-dispatch-offer-desktop.png",
+        "docs/showcase/02-third-person-driving.png",
+        "docs/showcase/03-cockpit-rain-night.png",
+        "docs/showcase/04-store-wait.png",
+        "docs/showcase/05-photo-proof.png",
+        "docs/showcase/06-run-complete.png",
+        "docs/showcase/07-mobile-driving.png",
+        "docs/showcase/08-wheel-mode-mobile.png",
+        "public/assets/blender/asset-showcase.png"
       ]
     },
     {
@@ -218,7 +315,8 @@
           "type": "notebook",
           "access": "public"
         }
-      ]
+      ],
+      "screenshotPaths": []
     },
     {
       "name": "DL-Happy-Sad-Image-Classification",
@@ -244,9 +342,21 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DL-Happy-Sad-Image-Classification/main/Happy-Guy.jpg",
           "alt": "Happy example input"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-Happy-Sad-Image-Classification/main/data/happy/Screen-Shot-2012-10-23-at-12.57.22-PM.png",
+          "alt": "Screen Shot 2012 10 23 at 12.57.22 PM"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-Happy-Sad-Image-Classification/main/data/sad/screen-shot-2014-07-31-at-6-09-12-pm.png",
+          "alt": "screen shot 2014 07 31 at 6 09 12 pm"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "data/happy/Screen-Shot-2012-10-23-at-12.57.22-PM.png",
+        "data/sad/screen-shot-2014-07-31-at-6-09-12-pm.png"
+      ]
     },
     {
       "name": "DL-Intent-Based-NLP-ChatBot",
@@ -267,7 +377,8 @@
           "alt": "Intent Based NLP ChatBot project overview"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": []
     },
     {
       "name": "DL-Kidney-CT-Classification",
@@ -308,9 +419,25 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DL-Kidney-CT-Classification/main/docs/showcase/05-mobile-analysis.jpg",
           "alt": "Mobile KidneyScan result using the published NIH CT"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-Kidney-CT-Classification/main/docs/showcase/01-multiphase-upload.jpg",
+          "alt": "Uploaded multiphase renal CT figure in the desktop workspace"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-Kidney-CT-Classification/main/docs/showcase/06-multiphase-result.jpg",
+          "alt": "Four-class prediction and model attention for the multiphase renal CT"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/showcase/01-multiphase-upload.jpg",
+        "docs/showcase/02-upload-preview.jpg",
+        "docs/showcase/03-attention-result.jpg",
+        "docs/showcase/04-original-comparison.jpg",
+        "docs/showcase/05-mobile-analysis.jpg",
+        "docs/showcase/06-multiphase-result.jpg"
+      ]
     },
     {
       "name": "DL-SceneTrace-3D",
@@ -348,6 +475,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DL-SceneTrace-3D/main/docs/showcase/02-validation.jpg",
           "alt": "Held-out appearance comparison and limitations"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SceneTrace-3D/main/docs/showcase/03-review-notes.jpg",
+          "alt": "Observation and hypothesis notes in the running product"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SceneTrace-3D/main/docs/showcase/05-colmap-result.jpg",
+          "alt": "Completed local COLMAP reconstruction from browser-submitted captures"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SceneTrace-3D/main/docs/showcase/06-mobile.jpg",
+          "alt": "Actual mobile breakpoint screenshot of the reconstruction review interface"
         }
       ],
       "liveLinks": [
@@ -356,6 +495,14 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-workbench.jpg",
+        "docs/showcase/02-validation.jpg",
+        "docs/showcase/03-review-notes.jpg",
+        "docs/showcase/04-source-inventory.jpg",
+        "docs/showcase/05-colmap-result.jpg",
+        "docs/showcase/06-mobile.jpg"
       ]
     },
     {
@@ -387,6 +534,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DL-SignBridge/main/docs/showcase/04-library.png",
           "alt": "ISL practice catalog with official dictionary link, search, and built-in demo gestures"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SignBridge/main/docs/showcase/05-mobile.png",
+          "alt": "SignBridge studio on a 390-pixel mobile viewport"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SignBridge/main/docs/showcase/06-personal-learning.png",
+          "alt": "Personal gesture teacher with capture controls, saved phrase, and vocabulary export and import"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SignBridge/main/docs/showcase/07-saved-pose.png",
+          "alt": "User-taught phrase displaying saved personal hand landmarks"
         }
       ],
       "liveLinks": [
@@ -395,6 +554,15 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-studio.png",
+        "docs/showcase/02-recognition.png",
+        "docs/showcase/03-avatar.png",
+        "docs/showcase/04-library.png",
+        "docs/showcase/05-mobile.png",
+        "docs/showcase/06-personal-learning.png",
+        "docs/showcase/07-saved-pose.png"
       ]
     },
     {
@@ -435,6 +603,30 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-live-scanning.png",
           "alt": "Live camera classification with a freeze-and-confirm action"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-live-detection.png",
+          "alt": "Real COCO-SSD detection on video frames with an overlay"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-camera-mobile.png",
+          "alt": "Responsive mobile camera workspace with video preview and capture controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-camera-recovery.png",
+          "alt": "Camera permission-policy recovery with external-browser and upload guidance"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-photo-scan.png",
+          "alt": "Actual banana photo recognition and reference sugar profile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-mobile.png",
+          "alt": "showcase mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/DL-SugarLens/main/docs/showcase-multiple-items.png",
+          "alt": "showcase multiple items"
         }
       ],
       "liveLinks": [
@@ -443,6 +635,20 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase-camera-capture.png",
+        "docs/showcase-camera-mobile.png",
+        "docs/showcase-camera-preview.png",
+        "docs/showcase-camera-recovery.png",
+        "docs/showcase-desktop.png",
+        "docs/showcase-live-detection.png",
+        "docs/showcase-live-scanning.png",
+        "docs/showcase-mobile.png",
+        "docs/showcase-multiple-items.png",
+        "docs/showcase-offline.png",
+        "docs/showcase-photo-scan.png",
+        "docs/showcase-portions.png"
       ]
     },
     {
@@ -456,15 +662,65 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T07:46:27Z",
-      "readme": "# 💨 Fart Alert\n\n### Step away. Let it rip.\n\nA playful desktop app that turns computer inactivity into a questionable soundtrack. Fart Alert detects system-wide mouse and keyboard inactivity, plays random fart sounds when you step away, and stops playback when you return.\n\nBuilt with **Electron, React, Vite, Web Audio, and Framer Motion**. Settings and custom sounds stay on your device.\n\n![Fart Alert desktop app with animated cloud mascot, inactivity monitor, theme settings, frequency controls, and custom sound uploader](docs/images/fart-alert-desktop.png)\n\n## Features\n\n- **System-wide inactivity detection:** mouse and keyboard activity anywhere on your computer resets the idle timer, including while the app is minimized.\n- **Automatic playback and stop:** repeat random sounds while idle; stop when activity resumes. Activity is checked approximately every 250 ms.\n- **Configurable timeout:** 5 seconds to 2 minutes, with a 10-second default.\n- **Three sound themes:** Cartoon Chaos, Heavy Duty, and Musical Farts.\n- **Frequency and volume controls:** Gentle, Standard, or Extreme, plus a sound test button.\n- **Custom WAV/MP3 uploads:** preview, enable, disable, and delete individual sounds.\n- **Playful visuals:** animated cloud mascot, colorful particle bursts, idle progress, and a session fart counter.\n- **Local persistence:** settings and uploaded sounds survive restarts. Monitoring starts paused on every launch.\n\n## Quick start\n\n### Requirements\n\n- Node.js **22.12 or later** and npm; initially built and tested with Node.js 24.\n- Windows for the included portable packaging script and desktop test setup.\n- An audio output device with its volume turned up.\n- Internet access for the initial dependency and Electron runtime downloads.\n\n```powershell\ngit clone https://github.com/vams2krish/FartAlert.git\ncd FartAlert\nnpm ci\nnpm run build\nnpm start\n```\n\n1. Click **Test sound** to check your audio.\n2. Choose your timeout, sound personality, frequency, and volume.\n3. Click **Activate Fart Alert**.\n4. Stop using the mouse and keyboard and wait for the timeout.\n5. Move the mouse or press a key to stop the idle playback.\n\nClick **Pause Fart Alert** to disable monitoring. Minimizing the window keeps monitoring active; closing it quits the app. The app does not prevent sleep, so sleeping the computer suspends it.\n\n## Custom sounds: upload → active → idle playback\n\n**Uploading a valid sound automatically enables it.** No second selection is needed.\n\nChoose one or more `.wav` or `.mp3` files in **Your secret weapons**. Each file must be **15 MB or less** and successfully decode as audio. Accepted files appear with their enabled toggle checked.\n\n| Control or state | Behavior |\n| --- | --- |\n| Play icon beside a file | Preview that specific sound |\n| Checked toggle | Include the file in random idle playback |\n| Disabled toggle | Keep the file saved but exclude it from idle playback |\n| Trash icon | Remove the saved sound |\n| One or more custom sounds enabled | Randomly choose from those files instead of the built-in theme |\n| All custom sounds disabled | Use the selected built-in theme again |\n\nRandom selection can repeat the same file. Previewing a file does not change its enabled state. Uploading a sound does not activate monitoring if monitoring is paused.\n\nFiles are stored locally in IndexedDB. There is no server upload, account requirement, or cloud synchronization. Clearing the app's local data removes saved files and settings.\n\n## Sound themes and frequency\n\n| Theme | Personality |\n| --- | --- |\n| Cartoon Chaos | Wobbly, bubbly synthesized toots |\n| Heavy Duty | Lower-pitched, longer rumbles |\n| Musical Farts | A short sequence of musical pitches |\n\nBuilt-in sounds are generated locally with Web Audio. Enabled custom files override the selected theme.\n\n| Frequency | Approximate start-to-start interval |\n| --- | --- |\n| Gentle | 9 seconds |\n| Standard | 4 seconds |\n| Extreme | 1.2 seconds |\n\nTiming varies slightly at random. Longer sounds finish before the next idle sound starts, with a short gap. Volume changes apply to the next sound. Zero volume silences playback without pausing monitoring.\n\n## Development commands\n\n| Command | Purpose |\n| --- | --- |\n| `npm ci` | Install locked dependencies |\n| `npm run dev` | Run Vite and Electron together |\n| `npm run build` | Build the production renderer into `dist/` |\n| `npm start` | Open the desktop app using the production build |\n| `npm run preview` | Serve the built UI in a browser |\n| `npm test` | Run Electron end-to-end tests |\n| `npm run package` | Build a portable Windows app |\n\n**Browser limitation:** browser preview monitors activity inside its page only. Use Electron for inactivity detection across your computer.\n\n## Build a Windows desktop app\n\n```powershell\nnpm run package\n```\n\nOpen `release/Fart Alert/Fart Alert.exe`. Keep the entire generated folder together: the executable needs its accompanying runtime files. This is a portable folder build, not an installer.\n\nGenerated dependencies, runtimes, caches, and build output are excluded from Git. This repository contains source code; build the executable locally unless a separate release is published. The packaging script currently targets Windows. macOS and Linux packages have not been configured or verified.\n\n## Architecture and privacy\n\n1. Electron's main process reads operating-system idle duration with `powerMonitor.getSystemIdleTime()`.\n2. An isolated preload bridge exposes that reading to the renderer through IPC.\n3. The renderer checks the duration approximately every 250 ms against the configured timeout.\n4. While idle and activated, it selects an enabled custom sound or synthesizes the chosen theme.\n5. Framer Motion particles and the mascot respond to playback; further sounds follow the frequency setting.\n6. Returning activity cancels pending playback and stops the current sound.\n\nThe app reads elapsed inactivity. It does not record typed keys, inspect other applications, capture screenshots, or save mouse trails. Node integration is disabled in the renderer and context isolation is enabled. There is no application backend, analytics service, or API key configuration.\n\n```text\nelectron/\n  main.cjs             Desktop window and system idle API\n  preload.cjs          Isolated IPC bridge\nsrc/\n  main.jsx             Monitoring, settings, uploads, UI, particles\n  audio.js             Web Audio synthesis and custom playback\n  storage.js           IndexedDB sound persistence\n  style.css            Responsive earthy visual design\nscripts/package.mjs    Portable Windows packaging\ntests/desktop.mjs      Electron end-to-end checks\ndocs/images/           Project screenshots\nvite.config.js         Renderer development and build settings\n```\n\n## Verification\n\nThe production build and Electron tests passed during initial implementation, including the packaged app. Tests check the real desktop idle API, upload auto-enabling, repeated custom playback during simulated idle time, stopping on simulated return, persistence after reload, theme fallback, preview, invalid files, deletion, and renderer errors.\n\nTests use controlled idle readings after checking the native API. They do not physically move the mouse or verify speaker output. For a manual test, activate the app, step away until it plays, then use the mouse or keyboard in another application.\n\nAfter packaging, run:\n\n```powershell\nnode tests/desktop.mjs --packaged\n```\n\n## Troubleshooting\n\n| Problem | What to check |\n| --- | --- |\n| No sound | Try **Test sound**, increase app and system volume, and check the audio output device. |\n| No idle playback | Activate monitoring, then wait without using the computer. Use the desktop edition. |\n| Theme is ignored | Disable all custom sounds; enabled uploads take priority. |\n| File is rejected | Choose a decodable WAV or MP3 of 15 MB or less. |\n| App will not start after cloning | Run `npm ci`, `npm run build`, then `npm start`. |\n| Portable executable fails | Keep its accompanying runtime files in the generated folder. |\n| Electron download runs out of space | Free disk space or put temporary files and the Electron download cache on a drive with space. |\n\n## Contributing\n\nIssues and pull requests are welcome. Include reproduction steps, operating system, selected theme and frequency, and whether custom sounds are enabled. Run the production build and relevant desktop tests before submitting playback changes.\n\n## License\n\n[ISC](LICENSE). Third-party packages retain their respective licenses.\n\n---\n\n*Stay curious. Stay hydrated. Stay upwind.*\n",
+      "pushedAt": "2026-11-15T19:22:57Z",
+      "readme": "# 💨 Fart Alert\n\n### Step away. Let it rip.\n\nA playful desktop app that turns computer inactivity into a questionable soundtrack. Fart Alert detects system-wide mouse and keyboard inactivity, plays random fart sounds when you step away, and stops playback when you return.\n\nBuilt with **Electron, React, Vite, Web Audio, and Framer Motion**. Settings and custom sounds stay on your device.\n\n**[Try the live browser demo on Vercel](https://fartalert.vercel.app/)** · **[Run the Windows desktop edition](#quick-start)**\n\nThe browser demo monitors activity inside its own page. The Windows app uses the operating system idle timer for desktop-wide detection.\n\n## Product showcase\n\nScreenshots from the production demo: midnight surfaces, mint controls, violet monitoring states, and a responsive layout.\n\n### Ready for a little chaos\n\nThe main dashboard starts paused, with clear controls for activation, sound previews, and your inactivity threshold.\n\n![Dashboard paused and ready to activate](docs/images/01-ready.png)\n\n### Musical Farts and particle bursts\n\nChoose a sound personality and preview it. The cloud mascot reacts while colorful particles burst during playback.\n\n![Musical Farts preview with animated cloud and colorful particles](docs/images/02-musical-burst.png)\n\n### Bring your own sounds\n\nUploaded sounds enable immediately. Each file has its own preview, enable toggle, and delete control. Here, Bubble-trouble is enabled and Rumble-remix is saved but disabled.\n\n![Custom WAV sound library with one enabled and one disabled sound](docs/images/03-custom-library.png)\n\n### Step away: automatic playback\n\nThe browser demo plays the enabled custom WAV after five seconds of real inactivity in the page.\n\n![Browser demo playing custom audio after the idle timer expires](docs/images/04-idle-playing.png)\n\n### Come back: quiet again\n\nInput resets the idle timer and stops automatic playback. Monitoring stays armed for the next time you step away.\n\n![Browser demo returned to its active monitoring state](docs/images/05-returned-active.png)\n\n### Mobile browser layout\n\nThe settings and monitor stack on narrow screens. See the [390 px mobile screenshot](docs/images/06-mobile.png).\n\n### Native Windows playback\n\n![Packaged Windows app playing custom audio after the operating-system idle timer triggers](docs/images/04-native-idle-playing.png)\n\nThe [Windows return-to-active capture](docs/images/07-native-returned.png) shows the monitor after system activity stopped playback.\n\n## Features\n\n- **System-wide inactivity detection:** mouse and keyboard activity anywhere on your computer resets the idle timer, including while the app is minimized.\n- **Automatic playback and stop:** repeat random sounds while idle; stop when activity resumes. Activity is checked approximately every 250 ms.\n- **Configurable timeout:** 5 seconds to 2 minutes, with a 10-second default.\n- **Three sound themes:** Cartoon Chaos, Heavy Duty, and Musical Farts.\n- **Frequency and volume controls:** Gentle, Standard, or Extreme, plus a sound test button.\n- **Custom WAV/MP3 uploads:** preview, enable, disable, and delete individual sounds.\n- **Playful visuals:** animated cloud mascot, colorful particle bursts, idle progress, and a session fart counter.\n- **Local persistence:** settings and uploaded sounds survive restarts. Monitoring starts paused on every launch.\n\n## Quick start\n\n### Requirements\n\n- Node.js **22.12 or later** and npm; initially built and tested with Node.js 24.\n- Windows for the included portable packaging script and desktop test setup.\n- An audio output device with its volume turned up.\n- Internet access for the initial dependency and Electron runtime downloads.\n\n```powershell\ngit clone https://github.com/vams2krish/FartAlert.git\ncd FartAlert\nnpm ci\nnpm run build\nnpm start\n```\n\n1. Click **Test sound** to check your audio.\n2. Choose your timeout, sound personality, frequency, and volume.\n3. Click **Activate Fart Alert**.\n4. Stop using the mouse and keyboard and wait for the timeout.\n5. Move the mouse or press a key to stop the idle playback.\n\nClick **Pause Fart Alert** to disable monitoring. Minimizing the window keeps monitoring active; closing it quits the app. The app does not prevent sleep, so sleeping the computer suspends it.\n\n## Custom sounds: upload → active → idle playback\n\n**Uploading a valid sound automatically enables it.** No second selection is needed.\n\nChoose one or more `.wav` or `.mp3` files in **Your secret weapons**. Each file must be **15 MB or less** and successfully decode as audio. Accepted files appear with their enabled toggle checked.\n\n| Control or state | Behavior |\n| --- | --- |\n| Play icon beside a file | Preview that specific sound |\n| Checked toggle | Include the file in random idle playback |\n| Disabled toggle | Keep the file saved but exclude it from idle playback |\n| Trash icon | Remove the saved sound |\n| One or more custom sounds enabled | Randomly choose from those files instead of the built-in theme |\n| All custom sounds disabled | Use the selected built-in theme again |\n\nRandom selection can repeat the same file. Previewing a file does not change its enabled state. Uploading a sound does not activate monitoring if monitoring is paused.\n\nFiles are stored locally in IndexedDB. There is no server upload, account requirement, or cloud synchronization. Clearing the app's local data removes saved files and settings.\n\n## Sound themes and frequency\n\n| Theme | Personality |\n| --- | --- |\n| Cartoon Chaos | Wobbly, bubbly synthesized toots |\n| Heavy Duty | Lower-pitched, longer rumbles |\n| Musical Farts | A short sequence of musical pitches |\n\nBuilt-in sounds are generated locally with Web Audio. Enabled custom files override the selected theme.\n\n| Frequency | Approximate start-to-start interval |\n| --- | --- |\n| Gentle | 9 seconds |\n| Standard | 4 seconds |\n| Extreme | 1.2 seconds |\n\nTiming varies slightly at random. Longer sounds finish before the next idle sound starts, with a short gap. Volume changes apply to the next sound. Zero volume silences playback without pausing monitoring.\n\n## Development commands\n\n| Command | Purpose |\n| --- | --- |\n| `npm ci` | Install locked dependencies |\n| `npm run dev` | Run Vite and Electron together |\n| `npm run build` | Build the production renderer into `dist/` |\n| `npm start` | Open the desktop app using the production build |\n| `npm run preview` | Serve the built UI in a browser |\n| `npm test` | Run Electron end-to-end tests |\n| `npm run package` | Build a portable Windows app |\n\n**Browser limitation:** browser preview monitors activity inside its page only. Use Electron for inactivity detection across your computer.\n\n## Build a Windows desktop app\n\n```powershell\nnpm run package\n```\n\nOpen `release/Fart Alert/Fart Alert.exe`. Keep the entire generated folder together: the executable needs its accompanying runtime files. This is a portable folder build, not an installer.\n\nGenerated dependencies, runtimes, caches, and build output are excluded from Git. This repository contains source code; build the executable locally unless a separate release is published. The packaging script currently targets Windows. macOS and Linux packages have not been configured or verified.\n\n## Architecture and privacy\n\n1. Electron's main process reads operating-system idle duration with `powerMonitor.getSystemIdleTime()`.\n2. An isolated preload bridge exposes that reading to the renderer through IPC.\n3. The renderer checks the duration approximately every 250 ms against the configured timeout.\n4. While idle and activated, it selects an enabled custom sound or synthesizes the chosen theme.\n5. Framer Motion particles and the mascot respond to playback; further sounds follow the frequency setting.\n6. Returning activity cancels pending playback and stops the current sound.\n\nThe app reads elapsed inactivity. It does not record typed keys, inspect other applications, capture screenshots, or save mouse trails. Node integration is disabled in the renderer and context isolation is enabled. There is no application backend, analytics service, or API key configuration.\n\n```text\nelectron/\n  main.cjs             Desktop window and system idle API\n  preload.cjs          Isolated IPC bridge\nsrc/\n  main.jsx             Monitoring, settings, uploads, UI, particles\n  audio.js             Web Audio synthesis and custom playback\n  storage.js           IndexedDB sound persistence\n  style.css            Base layout and mascot\n  studio.css           Midnight palette, interface states and responsive refinements\nscripts/package.mjs    Portable Windows packaging\ntests/desktop.mjs      Electron end-to-end checks\ntests/live-demo.mjs    Production browser and native idle demo\ndocs/images/           Project screenshots\nvite.config.js         Renderer development and build settings\n```\n\n## Verification\n\nThe production desktop regression suite checks the native desktop idle API, upload auto-enabling, repeated custom playback and stopping with controlled idle readings, persistence after reload, theme fallback, preview, invalid files, deletion, and renderer errors.\n\nThe live demo uses elapsed inactivity without replacing the idle source. It checks three built-in themes, custom uploads and toggles, audio signal in the Web Audio graph, and persistence. In browser mode it also checks pointer return and narrow layout. The audio check measures the app signal, not physical speaker output.\n\nAfter packaging, run:\n\n```powershell\nnode tests/desktop.mjs --packaged\nnode tests/live-demo.mjs\nnode tests/live-demo.mjs --browser --url=https://fartalert.vercel.app\n```\n\nFor the native demo, leave Windows idle until the test prints `SEND_REAL_INPUT_NOW`, then press a key in another app.\n\n## Troubleshooting\n\n| Problem | What to check |\n| --- | --- |\n| No sound | Try **Test sound**, increase app and system volume, and check the audio output device. |\n| No idle playback | Activate monitoring, then wait without using the computer. Use the desktop edition. |\n| Theme is ignored | Disable all custom sounds; enabled uploads take priority. |\n| File is rejected | Choose a decodable WAV or MP3 of 15 MB or less. |\n| App will not start after cloning | Run `npm ci`, `npm run build`, then `npm start`. |\n| Portable executable fails | Keep its accompanying runtime files in the generated folder. |\n| Electron download runs out of space | Free disk space or put temporary files and the Electron download cache on a drive with space. |\n\n## Contributing\n\nIssues and pull requests are welcome. Include reproduction steps, operating system, selected theme and frequency, and whether custom sounds are enabled. Run the production build and relevant desktop tests before submitting playback changes.\n\n## License\n\n[ISC](LICENSE). Third-party packages retain their respective licenses.\n\n---\n\n*Stay curious. Stay hydrated. Stay upwind.*\n",
       "images": [
         {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/01-ready.png",
+          "alt": "Dashboard paused and ready to activate"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/02-musical-burst.png",
+          "alt": "Musical Farts preview with animated cloud and colorful particles"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/03-custom-library.png",
+          "alt": "Custom WAV sound library with one enabled and one disabled sound"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/04-idle-playing.png",
+          "alt": "Browser demo playing custom audio after the idle timer expires"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/05-returned-active.png",
+          "alt": "Browser demo returned to its active monitoring state"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/04-native-idle-playing.png",
+          "alt": "Packaged Windows app playing custom audio after the operating-system idle timer triggers"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/06-mobile.png",
+          "alt": "06 mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/07-native-returned.png",
+          "alt": "07 native returned"
+        },
+        {
           "url": "https://raw.githubusercontent.com/vams2krish/FartAlert/main/docs/images/fart-alert-desktop.png",
-          "alt": "Fart Alert desktop app with animated cloud mascot, inactivity monitor, theme settings, frequency controls, and custom sound uploader"
+          "alt": "fart alert desktop"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://fartalert.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": [
+        "docs/images/01-ready.png",
+        "docs/images/02-musical-burst.png",
+        "docs/images/03-custom-library.png",
+        "docs/images/04-idle-playing.png",
+        "docs/images/04-native-idle-playing.png",
+        "docs/images/05-returned-active.png",
+        "docs/images/06-mobile.png",
+        "docs/images/07-native-returned.png",
+        "docs/images/fart-alert-desktop.png"
+      ]
     },
     {
       "name": "FlirtLive",
@@ -491,7 +747,8 @@
           "type": "app",
           "access": "owner-private"
         }
-      ]
+      ],
+      "screenshotPaths": []
     },
     {
       "name": "FullStack-PDRides",
@@ -522,6 +779,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/FullStack-PDRides/main/docs/images/pdrides-map.png",
           "alt": "OpenStreetMap tiles, pickup and destination, and fare controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FullStack-PDRides/main/docs/images/pdrides-help.png",
+          "alt": "Help center topics and frequently asked questions"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FullStack-PDRides/main/docs/images/pdrides-browse.png",
+          "alt": "Ride discovery filters and empty state"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/FullStack-PDRides/main/docs/images/pdrides-contact.png",
+          "alt": "PDRides contact and support page"
         }
       ],
       "liveLinks": [
@@ -531,6 +800,15 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/images/pdrides-browse.png",
+        "docs/images/pdrides-contact.png",
+        "docs/images/pdrides-help.png",
+        "docs/images/pdrides-home.png",
+        "docs/images/pdrides-login.png",
+        "docs/images/pdrides-map.png",
+        "docs/images/pdrides-register.png"
       ]
     },
     {
@@ -552,7 +830,8 @@
           "alt": "CrewAI project overview: researcher, writer, and Markdown article"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": []
     },
     {
       "name": "GenAI-Job-Apply-Bot",
@@ -573,7 +852,10 @@
           "alt": "Dashboard preview using sample data"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/dashboard-preview.png"
+      ]
     },
     {
       "name": "GenAI-LangChat-Agent",
@@ -592,15 +874,45 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T21:34:08Z",
-      "readme": "# GenAI · LangChat Agent\n\n**A compact Python playground for LangChain chat models, tool schemas, and command-line conversations.**\n\n![LangChat project overview](docs/project-overview.svg)\n\nLangChat explores the building blocks of a generative AI assistant: a chat model, a timezone lookup tool, single-prompt and interactive CLI modes, and an offline fallback. Its small codebase is intended for learning and experimentation.\n\n> **Status:** Educational prototype. The offline fallback works without an API key. The live model path needs message adaptation and a tool execution loop. Document retrieval and RAG are planned extensions, not implemented features.\n\n## Project name\n\n`GenAI-LangChat-Agent` follows **Project Type – Project Name**. GenAI describes the generative chat model, LangChat preserves the project identity, and Agent describes the intended tool-using direction. This project does not train an ML/DL model. RAGBot would imply a retrieval pipeline that is not present in this source.\n\n## Features and implementation\n\n| Component | Current behavior |\n| --- | --- |\n| Model configuration | ChatOpenAI with temperature zero and a configurable model name |\n| Tool schema | `get_time_in_timezone` returns formatted time for an IANA timezone |\n| Tool binding | `llm.bind_tools` advertises the timezone tool to the model |\n| Offline fallback | Fixed setup message when `OPENAI_API_KEY` is absent |\n| Single prompt | CLI `--prompt` argument |\n| Interactive CLI | In-memory conversation tuples; `exit` or `quit` ends the session |\n| Logging | Loguru events; optional rotating-file configuration helper |\n| Tests | One factory-construction smoke test |\n\n## Architecture\n\n```mermaid\nflowchart TD\n    A[Python CLI] --> B[Load environment and build agent]\n    B --> C{API key configured?}\n    C -->|No| D[Local fallback message]\n    C -->|Yes| E[ChatOpenAI with bound tool schema]\n    E -. Message adapter and execution loop needed .-> F[Tool-using conversation]\n    G[Timezone tool schema] --> E\n```\n\n`build_agent()` returns either a local fallback accepting an input dictionary or a LangChain model runnable. Those paths do not yet share a compatible input/output interface. A prompt template is constructed but is not connected to the runnable. Tool binding supplies a schema; it does not execute the Python tool or return its result to the model.\n\n## Technology\n\nPython 3.10+, LangChain, langchain-openai, python-dotenv, Loguru, Python zoneinfo, and pytest. Runtime requirements are in `requirements.txt`; test requirements are in `test_requirements.txt`. The original `pyproject.toml` has an empty dependencies list, so install using the requirements files.\n\n## Setup\n\n```powershell\ngit clone https://github.com/vams2krish/GenAI-LangChat-Agent.git\ncd GenAI-LangChat-Agent\npython -m venv .venv\n.\\.venv\\Scripts\\Activate.ps1\npython -m pip install -r requirements.txt -r test_requirements.txt\nCopy-Item .env.example .env\n```\n\nOn macOS/Linux, activate with `source .venv/bin/activate` and copy with `cp .env.example .env`.\n\nLeave `OPENAI_API_KEY` empty for the offline demo. To develop the live path, configure your own key privately in `.env`. Never commit credentials. Configuring a key does not resolve the incomplete live execution path described below.\n\n## Usage\n\nRun from the repository root after installing dependencies.\n\n### Offline single-prompt demo\n\nWith no key configured:\n\n```powershell\npython src/agent_cli.py --prompt \"What time is it in UTC?\"\n```\n\nExpected response:\n\n```text\n(LLM disabled: set OPENAI_API_KEY to enable the agent.)\n```\n\nThe fallback does not answer questions or execute tools.\n\n### Interactive mode\n\n```powershell\npython src/agent_cli.py --interactive\n```\n\nEnter text at `You>`. Type `exit` or `quit` to end. Conversation history lasts only for the process. The live runnable needs interface repairs before it can consume that history correctly.\n\n### Model selection argument\n\n```powershell\npython src/agent_cli.py --prompt \"Hello\" --model YOUR_MODEL_NAME\n```\n\nThe CLI source defaults to `gpt-4o-mini`; the factory defaults to `gpt-3.5-turbo`. These are source defaults, not model availability guarantees.\n\n### Direct timezone tool\n\n```powershell\npython -c \"from src.agent import get_time_in_timezone; print(get_time_in_timezone.invoke({'timezone': 'UTC'}))\"\n```\n\nExamples: `UTC`, `America/New_York`, `Asia/Kolkata`. Accessible IANA timezone data is required. If the operating system lacks it, install the optional `tzdata` package. Invalid names currently raise an exception.\n\n## Tests\n\n```powershell\npython -m pytest -q\n```\n\nThe included test checks factory construction only. It does not validate model output, tool execution, retrieval, or deployment readiness. No API request is needed when the key is absent.\n\n## Project structure\n\n```text\nGenAI-LangChat-Agent/\n  README.md\n  docs/project-overview.svg\n  .env.example\n  .gitignore\n  pyproject.toml\n  requirements.txt\n  test_requirements.txt\n  conftest.py\n  src/\n    agent.py\n    agent_cli.py\n    logging_config.py\n    tests/test_agent.py\n```\n\n## Logging and local data\n\nThe CLI logs prompt text through Loguru. Avoid sensitive prompts if logs may be collected. `configure_logging()` defines rotating `agent.log` files and console output, but is not currently called by the CLI. Local environments, caches, credentials, logs, and build artifacts are excluded through `.gitignore`.\n\n## Known limitations\n\n- The CLI passes an `input`/`chat_history` dictionary and expects a dictionary response; the live model runnable needs message input and returns a different response type.\n- Tool calls are not dispatched and results are not sent back to the model.\n- The prompt template and scratchpad are not wired into execution.\n- There is no document ingestion, chunking, embedding model, vector store, retrieval, or citation support.\n- There is no web UI, persistent history, authentication, or deployment configuration.\n- Dependencies have lower bounds rather than a lock file.\n- Error handling, bounded execution, retries, timeouts, and end-to-end tests need development.\n\n## Roadmap toward a RAG bot\n\n1. Normalize executor inputs/outputs and connect the prompt template.\n2. Add a bounded model/tool execution loop with tool-result messages.\n3. Test execution with fake model responses and explicit offline configuration.\n4. Implement document loading, chunking, embeddings, and a vector store.\n5. Retrieve relevant chunks and generate answers with document citations.\n6. Evaluate retrieval quality and add persistence and deployment controls.\n\n## Contributions and licensing\n\nFocused fixes, tests, and documentation improvements are welcome through issues and pull requests. Keep examples free of private documents and credentials. No license has been selected; public visibility alone does not grant an open-source license.\n",
+      "pushedAt": "2026-11-15T19:00:31Z",
+      "readme": "# GenAI LangChat Agent\n\nLangChat is a document workspace for finding relevant excerpts and asking a model to answer with cited context. Add TXT, Markdown, or CSV files, then search them in the browser or send selected passages to local Ollama or OpenRouter.\n\n**[Open LangChat on Vercel](https://genai-langchat-agent.vercel.app)**\n\n## Product gallery\n\n| Desktop workspace | Sample library |\n| --- | --- |\n| ![Workspace with empty library and prompt examples](docs/screenshots/01-workspace.png) | ![Workspace with sample documents loaded](docs/screenshots/02-source-library.png) |\n\n| Cited search | Model settings |\n| --- | --- |\n| ![Search result with expanded source excerpt](docs/screenshots/03-cited-search.png) | ![Dialog for OpenRouter credentials and model ID](docs/screenshots/04-model-settings.png) |\n\n[See the mobile upload and cited search screenshot](docs/screenshots/05-mobile-upload-search.png).\n\n## Choose a mode\n\n| Mode | Where it runs | What you get |\n| --- | --- | --- |\n| Source search | Browser | Ranked excerpts you can expand and read, without a model or key |\n| Local Ollama | Local LangChat server | Generated answers using your installed model and the retrieved excerpts |\n| OpenRouter | Local server or Vercel | Generated answers using your OpenRouter account and chosen model |\n\nUse **Load sample documents** or pick one of the example prompts to try a search. Upload your own files via **Add documents**. The library supports up to 20 nonempty files, at most 1 MB per file. **New chat** clears the thread and keeps the currently loaded documents. Reloading the page resets the tab, including the credential entered in Settings.\n\n## Run locally\n\nUse Node.js 24 for the local server and Python 3.10+ if you want the CLI.\n\n```sh\nnpm ci\nnpm run dev\n```\n\nOpen [localhost:4173](http://127.0.0.1:4173). Source search is ready immediately. For Ollama, start the local service and install a model if it is not already installed.\n\n```sh\nollama pull llama3.2\n```\n\nSelect **Local Ollama** in the composer. The server defaults to `llama3.2:latest` and connects to `127.0.0.1:11434`. Copy `.env.example` to `.env` and set `OLLAMA_MODEL` to use a different installed model.\n\nFor OpenRouter, enter a key and optional model ID in **Settings**. For local CLI use, store your key as `OPENROUTER_API_KEY` in the ignored `.env` file. The default model is `openrouter/free`. Model availability, account charges, and provider rate limits vary. Keep management keys separate from application keys.\n\nThe hosted site requires each OpenRouter user to supply their own credential. The key stays in page memory and passes through the HTTPS LangChat endpoint to OpenRouter. The Vercel deployment supports browser search and OpenRouter. Local Ollama runs through the local server.\n\n## Python CLI\n\nKeep the local Node server running for model requests.\n\n```sh\npython -m src.agent_cli --prompt \"Explain retrieval-augmented generation.\"\npython -m src.agent_cli --interactive\npython -m src.agent_cli --provider openrouter --prompt \"Explain lexical search.\"\npython -m src.agent_cli --time UTC\n```\n\nThe CLI shares the model gateway and retains a bounded conversation history in interactive mode. It can look up IANA timezones directly and uses the Python standard library. Install `tzdata` if your OS does not provide an IANA database.\n\n## Retrieval and design\n\nUploads are read in the browser. The retrieval module splits text into overlapping passages, scores token matches, and returns the three strongest excerpts. Source search displays the passages directly. Model modes send the question and selected excerpts to the provider, using numbered labels that correspond to the expandable sources. Lexical matching can miss paraphrases, and model citations should be checked against the excerpts.\n\nThe interface uses a charcoal canvas, olive surfaces, and a citron accent for actions and focus. Color tokens are defined in [web/style.css](web/style.css). At narrow widths, the source library moves above the conversation, and the inputs and cited excerpts remain accessible on a single column.\n\n## Verification\n\n```sh\nnpm test\nnpx playwright install chromium\nnpx playwright test\npython -m pip install -r test_requirements.txt\npython -m pytest -q\n```\n\nThe Node tests cover retrieval, provider requests, missing credentials, hosted access restrictions, and upstream failures. The browser tests cover the desktop workspace, sample documents, source citations, reset, mobile upload and removal, and request errors. They also regenerate the gallery from the running application. OpenRouter requests are mocked in the Node suite.\n\n## Deployment\n\nVercel serves `web/` and exposes the Node function at `/api/chat`. Import this repository into Vercel to build another deployment. The local server and CLI run separately on your computer. Keep `.env` and credentials out of Git.\n\nNo license has been selected for this repository.\n",
       "images": [
         {
-          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/project-overview.svg",
-          "alt": "LangChat project overview"
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/screenshots/01-workspace.png",
+          "alt": "Workspace with empty library and prompt examples"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/screenshots/02-source-library.png",
+          "alt": "Workspace with sample documents loaded"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/screenshots/03-cited-search.png",
+          "alt": "Search result with expanded source excerpt"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/screenshots/04-model-settings.png",
+          "alt": "Dialog for OpenRouter credentials and model ID"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-LangChat-Agent/main/docs/screenshots/05-mobile-upload-search.png",
+          "alt": "05 mobile upload search"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://genai-langchat-agent.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": [
+        "docs/screenshots/01-workspace.png",
+        "docs/screenshots/02-source-library.png",
+        "docs/screenshots/03-cited-search.png",
+        "docs/screenshots/04-model-settings.png",
+        "docs/screenshots/05-mobile-upload-search.png"
+      ]
     },
     {
       "name": "GenAI-Multimodal-Generation-Lab",
@@ -642,7 +954,10 @@
           "alt": "Generated point clouds for five primitive shape classes"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "assets/project-preview.png"
+      ]
     },
     {
       "name": "GenAI-Startup-Brief-Agent",
@@ -662,15 +977,65 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T21:33:48Z",
-      "readme": "# GenAI Startup Brief Agent\n\n![GenAI Startup Brief Agent project overview](docs/project-overview.svg)\n\n**Turn a startup idea into a structured business brief with LangChain and Ollama.**\n\nA Python generative AI prototype with a browser interface and command-line entry points. Enter an idea, add context, select an Ollama model, and request a brief covering customers, competition, monetization, go-to-market strategy, risks, and financial assumptions.\n\n**Project type:** Generative AI / LLM application  \n**Stack:** Python · LangChain · Ollama · Node.js · Express · HTML/CSS/JavaScript\n\n## Features\n\n- Startup brief generation from a single idea and optional additional details.\n- A prompt requesting 15 sections, including a Business Model Canvas and three-year financial projections with sensitivity analysis.\n- Browser UI backed by an Express endpoint that launches the Python CLI.\n- Dedicated startup CLI plus general single-prompt and interactive chat entry points.\n- Model choices exposed by the CLIs: `llama3.2:latest`, `minimax-m2.5:cloud`, and `kimi-k2.5:cloud`. Availability depends on your Ollama instance and account.\n- Deterministic stub output when the LangChain prompt or Ollama integration dependencies are missing.\n- Model availability validation and configurable connection retries.\n\n## Project visual\n\nThe image above is a project overview illustration, not a screenshot or a sample generated result.\n\n## Architecture\n\n```mermaid\nflowchart LR\n    U[Startup idea and context] --> W[Browser UI]\n    W --> E[Express: POST /api/startup-brief]\n    E --> C[Python startup CLI]\n    T[agent_startup.yaml] --> C\n    C --> P[LangChain prompt]\n    P --> O[ChatOllama]\n    O --> M[Ollama model]\n    M --> R[Generated brief]\n    R --> W\n```\n\n`src/startup_prompt.py` loads the prompt from `agent_startup.yaml`, with a fallback if the file or marker is missing. `src/agent.py` composes a system/human prompt with `ChatOllama` at temperature zero. The UI server invokes `src/startup_agent_cli.py` and returns its stdout to the browser.\n\nDespite the historical agent name, the current implementation is a prompt-to-model runnable; it does not implement autonomous tool calling, web research, retrieval, or a multi-agent workflow.\n\n## Getting started\n\n### Prerequisites\n\n- Python 3.10 or later.\n- Node.js and npm for the browser UI.\n- Ollama running with a model available under its exact tag.\n- The existing UI launcher expects a Windows virtual environment at `.venv/Scripts/python.exe`.\n\n### Install on Windows (PowerShell)\n\n```powershell\ngit clone https://github.com/vams2krish/GenAI-Startup-Brief-Agent.git\ncd GenAI-Startup-Brief-Agent\npython -m venv .venv\n.\\.venv\\Scripts\\Activate.ps1\npython -m pip install -r requirements.txt\npython -m pip install -r test_requirements.txt\nnpm --prefix ui ci\nollama pull llama3.2:latest\n```\n\nEnsure Ollama is running before generation. Run `ollama serve` in a separate terminal if it is not already running as an application/service.\n\n### Configuration\n\n```powershell\nCopy-Item .env.example .env\n```\n\n| Variable | Default | Purpose |\n| --- | --- | --- |\n| `OLLAMA_HOST` | `http://localhost:11434` | Ollama endpoint; used by validation and the Ollama client environment. |\n| `OLLAMA_MODEL_LIST_RETRIES` | `5` | Connection attempts during model validation. |\n| `OLLAMA_MODEL_LIST_RETRY_SLEEP_SECONDS` | `1` | Delay between validation attempts. |\n| `SKIP_OLLAMA_MODEL_VALIDATION` | unset | Set to `1` to bypass the availability check; inference still requires Ollama. |\n| `PORT` | `3000` | Express server port; set it in the shell that starts Node. |\n\nThe Python CLIs load `.env`. The Node server reads its process environment. An OpenAI API key is not used by the current implementation. Keep local configuration and secrets out of Git.\n\n### Browser interface\n\nStart from the **repository root** so the server resolves the Python executable and script correctly:\n\n```powershell\nnode ui/server.js\n```\n\nOpen [localhost:3000](http://localhost:3000), enter your startup idea and any extra context, choose a model, and submit the form.\n\n### Startup brief CLI\n\n```powershell\npython src/startup_agent_cli.py --idea \"A scheduling assistant for independent fitness coaches\" --model llama3.2:latest\n```\n\n### General chat CLI\n\n```powershell\npython src/agent_cli.py --prompt \"Explain product-market fit\" --model llama3.2:latest\npython src/agent_cli.py --interactive --model llama3.2:latest\n```\n\nType `exit` or `quit` to end interactive mode. Exchanges are accumulated locally but are not included in subsequent model prompts.\n\n## Brief contents\n\nThe prompt requests executive summary; startup idea; problem statement; target customers and personas; market sizing and trends; competition; differentiation; product and solution; nine-block Business Model Canvas; monetization; go-to-market strategy; metrics and milestones; three-year financial projections and sensitivity; risks and mitigations; and exit strategies.\n\nThese are model-generated drafts. There is no live source retrieval or numerical validation, so market claims, competitor details, and financial projections need independent verification.\n\n## Repository layout\n\n```text\n.\n├── README.md\n├── .env.example\n├── .gitignore\n├── agent_startup.yaml       # Editable business brief prompt\n├── requirements.txt        # Python runtime dependencies\n├── test_requirements.txt   # Test dependencies\n├── pyproject.toml          # Python project metadata\n├── conftest.py\n├── docs/project-overview.svg\n├── src/\n│   ├── agent.py            # Ollama validation and runnable factory\n│   ├── agent_cli.py        # General chat CLI\n│   ├── startup_agent_cli.py\n│   ├── startup_prompt.py   # Prompt loading and rendering\n│   ├── logging_config.py   # Optional logging configuration helper\n│   └── tests/test_agent.py\n└── ui/\n    ├── index.html          # Browser interface\n    ├── server.js           # Express and Python process bridge\n    ├── package.json\n    ├── package-lock.json\n    └── README_UI.md\n```\n\n## Validation\n\n```powershell\npython -m pytest -q\nnode --check ui/server.js\n```\n\nThe existing unit test checks that the agent can be constructed while model validation is patched out. It does not test live inference, response quality, or the browser-to-model flow.\n\n## Current limitations and troubleshooting\n\n- **Model missing / connection failure:** check `ollama list`, pull the exact model tag, and verify `OLLAMA_HOST`.\n- **`[stub]` output:** required LangChain/Ollama dependencies were not imported; install the runtime requirements in the interpreter you are using.\n- **UI launch directory:** use `node ui/server.js` from the root. Running `npm start` inside `ui` makes the current server resolve the wrong Python and script paths.\n- **Platform support:** the Python code can run on other platforms, but the UI process launcher currently hardcodes the Windows virtual environment layout and has no implemented system-Python fallback.\n- **Response handling:** the interactive chat path assumes a dictionary result even though the full runnable returns an AI message; it needs normalization for reliable interactive use. The startup CLI prints the raw message representation rather than extracting only its text.\n- **Server hardening:** authentication, request timeouts, robust subprocess error handling, and deployment controls are not implemented. Use as a local development prototype.\n- **Logging:** the CLIs use Loguru; file rotation is available in `configure_logging()` but the current entry points do not call that helper.\n- Dependencies use lower bounds rather than a fully pinned Python lockfile.\n\n## Customization\n\nEdit `agent_startup.yaml` to change the requested brief sections. Keep the `startup_brainstorm_prompt: |` field and `{idea}` placeholder. Add model options consistently in the CLI argument choices and browser selector. Extend `build_agent()` to introduce additional prompt behavior or an actual tool-calling runtime.\n\n## License\n\nNo license has been selected for this repository. Add a license before distributing it under specific reuse terms.\n",
+      "pushedAt": "2026-11-15T19:09:53Z",
+      "readme": "# GenAI Startup Brief Agent · Brief Studio\n\n**[Open live web research](https://genai-startup-brief-agent.vercel.app/)**\n\nTurn an early startup idea into a structured planning brief. The hosted app searches Tavily for evidence relevant to your idea and adds a linked source list. Local Ollama mode creates a separate model-generated draft.\n\n![Brief Studio desktop workspace and photographed startup examples](docs/screenshots/07-real-examples.png)\n\n## Features\n\n- Enter an idea and optional audience, budget, or launch constraints, or prefill the form with an example.\n- Generate a brief covering customers, competition, business model, go-to-market, financial assumptions, and risks. The local prompt requests 15 sections.\n- Copy the brief or download Markdown. A failed request keeps the previous brief available.\n- Generate a brief from the terminal or use the general chat CLI.\n\n## Real examples and screenshots\n\nExplore [Airbnb’s first hosted stays](https://news.airbnb.com/airbnb-celebrates-half-a-billion-guest-arrivals) and [Buffer’s landing-page test](https://buffer.com/resources/idea-to-paying-customers-in-7-weeks-how-we-did-it/). Each case includes an experiment you can adapt and a starter idea you can load into the form.\n\n[Desktop gallery](docs/screenshots/07-real-examples.png) · [Loaded example brief](docs/screenshots/08-loaded-example.png) · [Mobile gallery](docs/screenshots/09-mobile-examples.png)\n\nIllustrative photography from Unsplash: [living room](https://images.unsplash.com/photo-1600210492486-724fe5c67fb0) and [laptop workspace](https://images.unsplash.com/photo-1516321318423-f06f85e504b3).\n\n## Run with local Ollama\n\nPrerequisites: Python 3.10+, Node.js 22+, npm, and a running Ollama instance. From the repository root on Windows:\n\n```powershell\npython -m venv .venv\n.\\.venv\\Scripts\\python.exe -m pip install -r requirements.txt -r test_requirements.txt\nnpm --prefix ui ci\nollama pull llama3.2:latest\nnpm --prefix ui start\n```\n\nOn macOS or Linux, use `.venv/bin/python` instead. Open [127.0.0.1:3000](http://127.0.0.1:3000). Start `ollama serve` if Ollama is not running. Pull the exact model tag you intend to use. Cloud model tags require Ollama account access and can send prompts off-device.\n\n| Setting | Purpose |\n| --- | --- |\n| `OLLAMA_HOST` | Model endpoint; defaults to `http://localhost:11434`. |\n| `OLLAMA_MODEL_LIST_RETRIES` | Availability attempts; default 5. |\n| `OLLAMA_MODEL_LIST_RETRY_SLEEP_SECONDS` | Delay between attempts; default 1 second. |\n| `SKIP_OLLAMA_MODEL_VALIDATION` | Set to 1 to skip model availability validation. |\n| `PORT` | Local web port; default 3000. |\n| `PYTHON_EXEC` | Override the Python interpreter used by Express. |\n\nUse `.env.example` for Python settings. Set Node variables in the shell that starts the server.\n\n## CLI\n\nWith the environment active:\n\n```powershell\npython src/startup_agent_cli.py --idea \"A scheduling assistant for independent fitness coaches\"\npython src/agent_cli.py --prompt \"Explain product-market fit\"\npython src/agent_cli.py --interactive\n```\n\nInteractive chat includes the latest six exchanges. Type `exit` or `quit` to end.\n\n## Architecture and tests\n\nSet the optional TAVILY_API_KEY server environment variable in Vercel to use your Tavily account quota. Shared access is used by default. Vercel serves the interface from `ui/public`. Locally, the loopback Express server validates the request and invokes the Python CLI with a timeout. The CLI renders `agent_startup.yaml`, calls Ollama through LangChain, and prints response text. The browser displays output as text and exports Markdown. Market claims and financial assumptions need independent verification.\n\nSee the [UI documentation](ui/README_UI.md) for design tokens. Run `python -m pytest -q` and `node --check ui/server.js` for local checks. No license has been selected.\n",
       "images": [
         {
-          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/project-overview.svg",
-          "alt": "GenAI Startup Brief Agent project overview"
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/07-real-examples.png",
+          "alt": "Brief Studio desktop workspace and photographed startup examples"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/01-workspace.png",
+          "alt": "01 workspace"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/02-example-brief.png",
+          "alt": "02 example brief"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/03-export.png",
+          "alt": "03 export"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/04-mobile.png",
+          "alt": "04 mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/05-local-ollama.png",
+          "alt": "05 local ollama"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/06-recovery.png",
+          "alt": "06 recovery"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/08-loaded-example.png",
+          "alt": "08 loaded example"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/GenAI-Startup-Brief-Agent/main/docs/screenshots/09-mobile-examples.png",
+          "alt": "09 mobile examples"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://genai-startup-brief-agent.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": [
+        "docs/screenshots/01-workspace.png",
+        "docs/screenshots/02-example-brief.png",
+        "docs/screenshots/03-export.png",
+        "docs/screenshots/04-mobile.png",
+        "docs/screenshots/05-local-ollama.png",
+        "docs/screenshots/06-recovery.png",
+        "docs/screenshots/07-real-examples.png",
+        "docs/screenshots/08-loaded-example.png",
+        "docs/screenshots/09-mobile-examples.png"
+      ]
     },
     {
       "name": "GUI-Desktop-Browser",
@@ -703,7 +1068,13 @@
           "alt": "The same clip saved with a 100 percent progress bar"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/01-welcome.png",
+        "docs/images/02-browsing.png",
+        "docs/images/03-discovery.png",
+        "docs/images/04-download.png"
+      ]
     },
     {
       "name": "ImmigrationBot",
@@ -734,9 +1105,25 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ImmigrationBot/main/docs/showcase/knowledge-base.png",
           "alt": "Synthetic guide indexed by local Ollama"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ImmigrationBot/main/docs/showcase/assistant.png",
+          "alt": "Live Ollama answer citing the imported guide"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ImmigrationBot/main/docs/images/waypoint-dashboard.png",
+          "alt": "waypoint dashboard"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/showcase/assistant.png",
+        "docs/showcase/checklist.png",
+        "docs/showcase/dashboard.png",
+        "docs/showcase/knowledge-base.png",
+        "docs/showcase/timeline.png",
+        "docs/images/waypoint-dashboard.png"
+      ]
     },
     {
       "name": "iris-control-dl",
@@ -766,9 +1153,37 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/workspace.png",
           "alt": "Iris Control workspace — actual application screenshot"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/device-setup.png",
+          "alt": "device setup"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/gesture-settings.png",
+          "alt": "gesture settings"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/overview.png",
+          "alt": "overview"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/typing-workspace.png",
+          "alt": "typing workspace"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/iris-control-dl/main/docs/images/windows-controller.png",
+          "alt": "windows controller"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/device-setup.png",
+        "docs/images/gesture-settings.png",
+        "docs/images/overview.png",
+        "docs/images/typing-workspace.png",
+        "docs/images/windows-controller.png",
+        "docs/images/workspace.png"
+      ]
     },
     {
       "name": "MathBlitz",
@@ -799,9 +1214,47 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-welcome.jpg",
           "alt": "Native Android welcome screen with real-life math introduction"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-practice.jpg",
+          "alt": "Native Android timed budget scenario and answer controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-result.jpg",
+          "alt": "Native Android correct answer feedback showing 14 points awarded and updated progress"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-library.jpg",
+          "alt": "Native Android daily-life library with DIY, health, recipes, utilities, and estimation categories"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-progress.jpg",
+          "alt": "Native Android progress metrics and rankings for synthetic demo users"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-hint.jpg",
+          "alt": "android hint"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/MathBlitz/main/docs/images/android-landscape.jpg",
+          "alt": "android landscape"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/android-hint.jpg",
+        "docs/images/android-landscape.jpg",
+        "docs/images/android-library.jpg",
+        "docs/images/android-overview.jpg",
+        "docs/images/android-practice.jpg",
+        "docs/images/android-progress.jpg",
+        "docs/images/android-result.jpg",
+        "docs/images/android-settings.jpg",
+        "docs/images/android-welcome.jpg",
+        "docs/images/mathblitz-library.jpg",
+        "docs/images/mathblitz-practice.jpg",
+        "docs/images/mathblitz-welcome.jpg"
+      ]
     },
     {
       "name": "ML-Book-Recommendation-System",
@@ -839,6 +1292,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ML-Book-Recommendation-System/main/docs/images/05-another-book.png",
           "alt": "Recommendations for The Da Vinci Code"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Book-Recommendation-System/main/docs/images/06-mobile.png",
+          "alt": "Reading list at mobile width"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Book-Recommendation-System/main/docs/images/02-empty-selection.png",
+          "alt": "Prompt to choose a title from the catalog"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Book-Recommendation-System/main/docs/images/07-why-this-book.png",
+          "alt": "Why this book explanation open beneath a recommendation"
         }
       ],
       "liveLinks": [
@@ -848,6 +1313,15 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/images/01-discover.png",
+        "docs/images/02-empty-selection.png",
+        "docs/images/03-search.png",
+        "docs/images/04-recommendations.png",
+        "docs/images/05-another-book.png",
+        "docs/images/06-mobile.png",
+        "docs/images/07-why-this-book.png"
       ]
     },
     {
@@ -885,6 +1359,30 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/live-mobile.png",
           "alt": "Production mobile prediction and model notes"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/demo-overview.png",
+          "alt": "Desktop scenario builder before submitting"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/demo-baseline.png",
+          "alt": "Baseline estimate of $21,213.23"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/demo-scenario.png",
+          "alt": "Seven-room scenario estimate of $25,652.06"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/demo-model-notes.png",
+          "alt": "Model metrics, caveats, and notebook chart"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/actual-vs-predicted.png",
+          "alt": "actual vs predicted"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Boston-Housing-Price-Prediction/main/docs/images/demo-mobile.png",
+          "alt": "demo mobile"
         }
       ],
       "liveLinks": [
@@ -894,6 +1392,18 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/images/actual-vs-predicted.png",
+        "docs/images/demo-baseline.png",
+        "docs/images/demo-mobile.png",
+        "docs/images/demo-model-notes.png",
+        "docs/images/demo-overview.png",
+        "docs/images/demo-scenario.png",
+        "docs/images/live-desktop.png",
+        "docs/images/live-field-help.png",
+        "docs/images/live-mobile-help.png",
+        "docs/images/live-mobile.png"
       ]
     },
     {
@@ -907,15 +1417,70 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T21:40:07Z",
-      "readme": "# ML - Customer Segmentation Mall\n\n**Unsupervised machine learning (ML) for exploring customer groups with K-Means clustering.**\n\nThis project explores mall customer demographics, annual income, and spending behavior through a Python notebook. It demonstrates data inspection, feature preparation, standardization, cluster exploration, model fitting, visualization, and assigning a sample customer to a segment. Customer groups can provide a starting point for targeted marketing hypotheses and customer engagement planning.\n\n![Project elbow-method visualization](docs/images/elbow-method.png)\n\n*Project image extracted from the notebook's saved output: within-cluster sum of squares (WCSS) across candidate cluster counts.*\n\n## ML or DL?\n\nThis is a **machine learning (ML)** project, specifically **unsupervised learning / clustering**. It uses scikit-learn's K-Means to group records without labeled target outcomes. It is **not deep learning (DL)**: no neural networks or deep learning frameworks are used.\n\n## Dataset\n\n`archive/Mall_Customers.csv` contains **200 records and five columns**:\n\n| Column | Description | Current model usage |\n| --- | --- | --- |\n| `CustomerID` | Customer identifier | Included as a numeric feature |\n| `Genre` | Categorical gender field, using the CSV's original name | Encoding demonstrated separately; excluded from clustering |\n| `Age` | Customer age | Included |\n| `Annual Income (k$)` | Annual income in thousands of dollars | Included |\n| `Spending Score (1-100)` | Dataset spending score | Included |\n\nThe notebook checks dataset shape, missing values, and categories. The original dataset source and redistribution license are not recorded in the supplied files; no specific provenance or license is asserted here.\n\n## Methodology\n\n1. Load the CSV with pandas and inspect the data.\n2. Drop `Genre` to create a numeric feature matrix.\n3. Standardize the numeric features using `StandardScaler`.\n4. Demonstrate one-hot encoding of `Genre` separately.\n5. Fit K-Means for 1–10 clusters and plot inertia using the elbow method.\n6. Fit a five-cluster model with `init='k-means++'` and `random_state=42`.\n7. Append cluster labels to the dataframe in memory and visualize segments.\n8. Scale a sample customer record and predict its cluster assignment.\n\nCluster identifiers are arbitrary labels, not customer rankings or validated business categories.\n\n## Technology\n\n- Python and Jupyter Notebook\n- pandas and NumPy for data handling\n- scikit-learn for preprocessing and clustering\n- Matplotlib for visualization\n- Seaborn, imported in the notebook\n\n## Run locally\n\n```bash\ngit clone https://github.com/vams2krish/ML-Customer-Segmentation-Mall.git\ncd ML-Customer-Segmentation-Mall\npython -m venv .venv\n```\n\nActivate the environment in Windows PowerShell:\n\n```powershell\n.\\.venv\\Scripts\\Activate.ps1\n```\n\nOr on macOS / Linux:\n\n```bash\nsource .venv/bin/activate\n```\n\nInstall dependencies and launch the notebook:\n\n```bash\npython -m pip install -r requirements.txt\njupyter notebook Customer-Segmentation-Mall.ipynb\n```\n\nBefore running the cells, replace the original machine-specific CSV path with:\n\n```python\ncustomer_dataset = pd.read_csv(\"archive/Mall_Customers.csv\")\n```\n\nRun from the repository root using a Python version supported by the scientific packages. Dependencies are unpinned and do not represent a verified runtime environment. The notebook's `sparse_output` argument requires scikit-learn 1.2 or newer.\n\n## Outputs\n\n- Elbow-method chart comparing candidate cluster counts.\n- Five cluster labels added to the in-memory customer dataframe.\n- A saved customer-segment scatter plot.\n- A sample prediction; the stored output reports cluster `3`.\n\nSaved outputs are from an earlier notebook run and have not been regenerated for publication. Five clusters are selected in the code; no silhouette score, stability analysis, or external validation is reported. Assignments can vary with library versions and initialization defaults.\n\n## Known limitations\n\n- **Feature selection:** `CustomerID` participates in clustering. Remove this identifier before drawing business conclusions, since identifiers generally should not determine customer similarity.\n- **Plot labels:** the segment scatter plot uses standardized `CustomerID` and `Age` (columns 0 and 1), although its labels say income and spending score. Correct the selected columns or labels before interpreting it.\n- **Centroids:** the segment plot references lowercase `kmeans` from the elbow loop rather than the five-cluster `Kmeans` model. Use the five-cluster model's centroids for a consistent plot.\n- **Encoding:** the one-hot encoded category values are not combined with the model features.\n- **Reproducibility:** explicitly set `n_init` and pin a tested environment to avoid changes in library defaults.\n- **Validation:** compare cluster quality, stability, and segment profiles before applying results to business decisions.\n- **Scope:** this is an exploratory notebook with a small dataset, not a deployed service or a validated production segmentation system. No trained model export is included.\n\n## Repository structure\n\n```text\nML-Customer-Segmentation-Mall/\n├── Customer-Segmentation-Mall.ipynb   # Original exploratory notebook\n├── archive/\n│   └── Mall_Customers.csv            # Input data\n├── docs/images/\n│   └── elbow-method.png              # Saved notebook chart\n├── requirements.txt                 # Notebook dependencies\n├── .gitignore\n└── README.md\n```\n\n## Potential applications and next steps\n\nAfter correcting feature selection and plotting, evaluate cluster stability and summarize each segment's demographics, income, and spending patterns. Validated segments could support customer profiling and campaign planning. These are potential applications, not measured business outcomes of the current project.\n",
+      "pushedAt": "2026-11-15T18:45:06Z",
+      "readme": "# Segment Studio · Mall Customer Segmentation\n\n[**Open the live Vercel demo →**](https://ml-customer-segmentation-mall.vercel.app)\n\nSegment Studio is an **unsupervised machine learning (ML)** project. Its interactive dashboard uses K-Means to explore how 200 sample mall customers group by age, annual income, and spending score. The browser fits the model locally; customer profiles entered into the app are neither stored nor sent to a server.\n\n![Dashboard overview showing the customer scatter plot, segment mix, and modeling infographic](docs/screenshots/01-overview.png)\n\n## Explore the product\n\n- **Overview:** see sample averages, compare 2–8 clusters, and isolate any group in the income vs. spending chart. Each diamond marks the displayed coordinates of a fitted centroid; age is the third model feature.\n- **Segments:** compare each segment’s customer count, sample share, and typical age, income, and spending score in original units.\n- **Predict:** enter a profile to find the nearest segment in the current fit. The form validates each field before assigning a group.\n- **Field guide:** select a **?** to see what a label or control means, including its units and relevant ranges. Press **Escape** or select **Got it** to close and return focus to the control.\n- **Model walkthrough:** follow the four-step infographic from sample data and scaling to grouping and assignment.\n\n## Product screenshots\n\n| Desktop workspace | Desktop workspace |\n| --- | --- |\n| [Segment focus](docs/screenshots/02-segment-focus.png) ![One segment highlighted](docs/screenshots/02-segment-focus.png) | [Seven-cluster view](docs/screenshots/03-seven-clusters.png) ![Dashboard refit to seven clusters](docs/screenshots/03-seven-clusters.png) |\n| [Segment profiles](docs/screenshots/04-segment-profiles.png) ![Profile cards](docs/screenshots/04-segment-profiles.png) | [Customer assignment](docs/screenshots/05-customer-assignment.png) ![Profile form and nearest-segment result](docs/screenshots/05-customer-assignment.png) |\n| [Chart field guide](docs/screenshots/08-chart-field-guide.png) ![Chart help explaining observed ranges](docs/screenshots/08-chart-field-guide.png) | [Prediction field guide](docs/screenshots/10-prediction-field-guide.png) ![Income help explaining units and input limits](docs/screenshots/10-prediction-field-guide.png) |\n\n| [Mobile overview](docs/screenshots/06-mobile-overview.png) | [Mobile assignment](docs/screenshots/07-mobile-assignment.png) |\n| --- | --- |\n| <img src=\"docs/screenshots/06-mobile-overview.png\" alt=\"Mobile dashboard\" width=\"265\"> | <img src=\"docs/screenshots/07-mobile-assignment.png\" alt=\"Mobile prediction form and result\" width=\"265\"> |\n\n![Infographic showing input, scale, cluster and match steps](docs/screenshots/09-model-infographic.png)\n\n## Model and dataset\n\nThe [bundled CSV](archive/Mall_Customers.csv) contains 200 customer rows. The original source and redistribution license are not recorded in the supplied project files.\n\n| Field | Observed sample values | Model role |\n| --- | --- | --- |\n| Age | 18–70 years | Fit and prediction |\n| Annual income | $15k–$137k | Fit and prediction |\n| Spending score | 1–99, on a defined scale of 1–100 | Fit and prediction |\n| CustomerID | 200 unique identifiers | Record identity only |\n| Genre | Categorical field in the source CSV | Excluded |\n\nThe model standardizes the three features, fits K-Means with 20 seeded initializations per candidate fit, and assigns each record to the nearest centroid in standardized space. The dashboard uses descriptive names based on centroid age, income, and spending score. For example, the five-cluster view includes Young high scorers and High-income low scorers. Names can change when the cluster count changes. Five is an exploratory starting point. The notebook also compares inertia and silhouette scores across 2–8 clusters. The browser and scikit-learn use different initializers; exact assignments can differ.\n\nThis small sample supports exploration. An assignment does not express confidence or validate a business segment, especially for inputs outside the observed ranges.\n\n## Design system\n\nThe UI uses a **midnight navy** canvas (`#101725`), **slate** panels (`#151F31`), and **lime** accents (`#B5ED78`) for active navigation, focus, and primary actions. Segments use a separate categorical palette carried through plots, bars, profiles, and results. Labels and counts supplement the colors. The workspace switches to stacked cards and compact navigation on mobile.\n\n## Run and test locally\n\nUse Node.js 24 or newer for the web app.\n\n```sh\nnpm ci\nnpm run dev\nnpm run build\nnpm test\nnpx playwright install chromium\nnpm run test:e2e\n```\n\nModel tests cover all supported cluster counts, centroid means, reproducibility, identifier exclusion, and invalid inputs. Browser tests cover segment filtering, refitting, profiles, prediction and validation, mobile layout, keyboard navigation, field-guide ranges and focus restoration, and the live infographic. To regenerate screenshots, set `CAPTURE_SCREENSHOTS=1` before running the browser tests.\n\nOpen the [executed Python notebook](Customer-Segmentation-Mall.ipynb) from the repository root:\n\n```sh\npython -m pip install -r requirements.txt\npython -m notebook Customer-Segmentation-Mall.ipynb\n```\n\nThe web app is a static Vite build deployed to Vercel. To update the linked project from an authenticated checkout, run `npx vercel deploy --prod`. GitHub auto-deploy requires a separate GitHub login connection in Vercel.\n\n## Source map\n\n- `src/model.js` — CSV validation, scaling, K-Means, and nearest-centroid assignment.\n- `src/app.js`, `src/help.js`, `src/style.css` — dashboard, field guide, and design tokens.\n- `tests/` — model and browser checks.\n- `docs/screenshots/` — real product captures.\n",
       "images": [
         {
-          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/images/elbow-method.png",
-          "alt": "Project elbow-method visualization"
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/01-overview.png",
+          "alt": "Dashboard overview showing the customer scatter plot, segment mix, and modeling infographic"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/02-segment-focus.png",
+          "alt": "One segment highlighted"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/03-seven-clusters.png",
+          "alt": "Dashboard refit to seven clusters"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/04-segment-profiles.png",
+          "alt": "Profile cards"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/05-customer-assignment.png",
+          "alt": "Profile form and nearest-segment result"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/08-chart-field-guide.png",
+          "alt": "Chart help explaining observed ranges"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/10-prediction-field-guide.png",
+          "alt": "Income help explaining units and input limits"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/06-mobile-overview.png",
+          "alt": "Mobile dashboard"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/07-mobile-assignment.png",
+          "alt": "07 mobile assignment"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Customer-Segmentation-Mall/main/docs/screenshots/09-model-infographic.png",
+          "alt": "09 model infographic"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://ml-customer-segmentation-mall.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": [
+        "docs/screenshots/01-overview.png",
+        "docs/screenshots/02-segment-focus.png",
+        "docs/screenshots/03-seven-clusters.png",
+        "docs/screenshots/04-segment-profiles.png",
+        "docs/screenshots/05-customer-assignment.png",
+        "docs/screenshots/06-mobile-overview.png",
+        "docs/screenshots/07-mobile-assignment.png",
+        "docs/screenshots/08-chart-field-guide.png",
+        "docs/screenshots/09-model-infographic.png",
+        "docs/screenshots/10-prediction-field-guide.png"
+      ]
     },
     {
       "name": "ML-FlowRank",
@@ -951,6 +1516,14 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ML-FlowRank/main/docs/screenshots/02-personal-insights.png",
           "alt": "Personal insights and discovery activity"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-FlowRank/main/docs/screenshots/03-privacy-controls.png",
+          "alt": "Privacy settings, personalization toggle, export and deletion controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-FlowRank/main/docs/screenshots/04-mobile-feed.png",
+          "alt": "FlowRank mobile video feed"
         }
       ],
       "liveLinks": [
@@ -960,6 +1533,14 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/screenshots/01-discovery-desktop.png",
+        "docs/screenshots/02-personal-insights.png",
+        "docs/screenshots/03-privacy-controls.png",
+        "docs/screenshots/04-mobile-feed.png",
+        "docs/screenshots/05-explore-catalog.png",
+        "docs/screenshots/06-saved-reels.png"
       ]
     },
     {
@@ -991,6 +1572,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ML-Python-R-Data-Science-Notebooks/main/assets/showcase/lesson.jpg",
           "alt": "NumPy example in an accessible lesson dialog"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Python-R-Data-Science-Notebooks/main/assets/showcase/playground.jpg",
+          "alt": "Interactive regression with 60 points and an exact fit"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Python-R-Data-Science-Notebooks/main/assets/showcase/gallery.jpg",
+          "alt": "Matplotlib bar, scatter and histogram examples"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Python-R-Data-Science-Notebooks/main/assets/showcase/mobile.jpg",
+          "alt": "Notebook Lab at a 390-pixel mobile viewport"
         }
       ],
       "liveLinks": [
@@ -999,6 +1592,15 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "assets/showcase/gallery.jpg",
+        "assets/showcase/home.jpg",
+        "assets/showcase/lesson.jpg",
+        "assets/showcase/lessons.jpg",
+        "assets/showcase/mobile.jpg",
+        "assets/showcase/playground.jpg",
+        "assets/project-preview.png"
       ]
     },
     {
@@ -1012,15 +1614,65 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "pushedAt": "2026-10-28T21:39:10Z",
-      "readme": "# ML - Zoo Animal Classification\n\n![Wildlife cover featuring a variety of animals](docs/images/zoo-cover.png)\n\n*AI-generated wildlife cover artwork; illustrative, not an application screenshot.*\n\nAn educational machine learning project that explores animal traits, trains a **K-Nearest Neighbors (KNN)** classifier, and provides a **Streamlit interface** for predicting an animal name from 16 biological attributes.\n\nThe repository brings together a dataset, an exploratory Jupyter notebook, a serialized model, and an interactive prediction app. It is a learning prototype: the saved evaluation shows **0% test accuracy**, and the preprocessing needs correction before predictions can be considered reliable.\n\n## Project overview\n\n- Explore animal records with descriptive statistics, missing-value checks, and visualizations.\n- Examine feature relationships with a correlation heatmap.\n- Train a five-neighbor classifier with scikit-learn.\n- Inspect a confusion matrix and classification report.\n- Enter traits using sliders and display a predicted animal name in Streamlit.\n\nDespite the app title referring to animal “type,” the notebook's target is `animal_name`, not broad categories such as mammal, bird, or reptile. The model uses structured traits rather than photographs; this is not an image-recognition system.\n\n## Dataset and features\n\nThe included file, [`archive/zoo_data-1.csv`](archive/zoo_data-1.csv), contains **101 records**, **100 distinct animal names**, and **17 columns**: the target plus 16 input features. The repository does not currently document the dataset's original source or redistribution license.\n\n| Feature | Meaning | Input |\n| --- | --- | --- |\n| `hair` | Has hair | 0 / 1 |\n| `feathers` | Has feathers | 0 / 1 |\n| `eggs` | Lays eggs | 0 / 1 |\n| `milk` | Produces milk | 0 / 1 |\n| `airborne` | Can fly | 0 / 1 |\n| `aquatic` | Aquatic animal | 0 / 1 |\n| `predator` | Predatory animal | 0 / 1 |\n| `toothed` | Has teeth | 0 / 1 |\n| `backbone` | Has a backbone | 0 / 1 |\n| `breathes` | Breathes air | 0 / 1 |\n| `venomous` | Venomous | 0 / 1 |\n| `fins` | Has fins | 0 / 1 |\n| `legs` | Number of legs | App accepts integers from 0 to 8 |\n| `tail` | Has a tail | 0 / 1 |\n| `domestic` | Domestic animal | 0 / 1 |\n| `catsize` | Cat-sized or larger indicator | 0 / 1 |\n\nFor binary features, `0` means no and `1` means yes. The feature descriptions reflect the column conventions; an authoritative dataset dictionary is not included.\n\n## Repository structure\n\n```text\nML-Zoo-Animal-Classification/\n|-- README.md                              # Project documentation\n|-- app.py                                 # Streamlit prediction interface\n|-- Zoo-Animal-Classification-ML.ipynb       # Exploration, training, evaluation\n|-- model.pkl                              # Serialized KNN estimator\n|-- requirements.txt                       # Existing core dependencies\n|-- archive/\n|   `-- zoo_data-1.csv                      # Animal traits and names\n`-- docs/images/\n    `-- zoo-cover.png                      # Illustrative wildlife cover\n```\n\n## Run the application locally\n\nInstall Python with `venv` support, then clone the repository:\n\n```bash\ngit clone https://github.com/vams2krish/ML-Zoo-Animal-Classification.git\ncd ML-Zoo-Animal-Classification\npython -m venv .venv\n```\n\nActivate the environment:\n\n```powershell\n# Windows PowerShell\n.venv\\Scripts\\Activate.ps1\n```\n\n```bash\n# macOS / Linux\nsource .venv/bin/activate\n```\n\nInstall the packages used by the app and notebook:\n\n```bash\npython -m pip install streamlit pandas numpy matplotlib seaborn scikit-learn jupyter\npython -m streamlit run app.py\n```\n\nRun the command from the repository root so the app can find `model.pkl`. Open the local URL printed by Streamlit, set the trait sliders, and click **submit** to display a predicted animal name. The current implementation calculates a prediction on each Streamlit rerun; the button controls when it is displayed.\n\nThe existing `requirements.txt` lists unpinned core dependencies and omits Streamlit, Seaborn, and Jupyter; the install command above includes these. There is no tested Python-version matrix. The notebook metadata records Python 3.11.5, but the environment used to export the model is not fully documented. Serialized estimators can be version-sensitive. Only load pickle files from sources you trust.\n\n## Explore and train in the notebook\n\n```bash\npython -m jupyter notebook Zoo-Animal-Classification-ML.ipynb\n```\n\nBefore running the notebook, replace the machine-specific `filePath` assignment in the data-loading cell with:\n\n```python\nfilePath = \"archive/zoo_data-1.csv\"\n```\n\nThe notebook currently follows these steps:\n\n1. Load the CSV and inspect its contents, summary statistics, and missing values.\n2. Plot animal-name counts and feature correlations.\n3. Separate `animal_name` from the 16 input features.\n4. Split records into 80% training and 20% test data with `random_state=42`.\n5. Apply `StandardScaler` and fit `KNeighborsClassifier(n_neighbors=5)`.\n6. Generate predictions, a confusion matrix, and a classification report.\n7. Predict an example record and save the estimator as `model.pkl`.\n\nRunning the export cell overwrites `model.pkl` in the working directory.\n\n## Evaluation and current limitations\n\nThe **stored notebook output** reports accuracy of **0.00 on 21 test records**. This is an existing recorded result, not a newly reproduced benchmark. No claim of production readiness or accurate animal identification is made.\n\nSeveral implementation choices explain why further work is needed:\n\n- **Sparse target labels:** 100 distinct names across 101 rows leave almost no repeated examples per class. Many test labels have no training examples, so a classifier cannot learn to recognize those names from this split.\n- **Test preprocessing:** the notebook calls `fit_transform` separately on the training and test sets. It should fit the scaler on training data and use `transform` for test data. The current test transformation also replaces the scaler's fitted state before the example prediction.\n- **Training/inference mismatch:** the model is trained on scaled features, but the Streamlit app passes raw slider values. Only the KNN estimator is saved; the scaler is not exported with it.\n- **Portability:** the notebook uses a machine-specific absolute dataset path, and dependencies are not pinned.\n- **Input validation:** sliders allow biologically inconsistent combinations and leg counts that may be outside the dataset's observed examples.\n\n## Suggested next steps\n\n1. Choose a target supported by enough repeated examples; if broad animal groups are desired, add a verified class label and document its source.\n2. Use a scikit-learn `Pipeline` containing `StandardScaler` and KNN, and save the entire pipeline for consistent inference.\n3. Evaluate with an appropriate split or cross-validation strategy after resolving the target-label problem.\n4. Pin and test dependencies, make the dataset path portable, and add clear app error handling.\n5. Document dataset provenance and licensing, then add validated example predictions and an actual interface screenshot.\n\n## Technology\n\n**Python · pandas · NumPy · scikit-learn · Matplotlib · Seaborn · Jupyter · Streamlit · pickle**\n\n## Author and licensing\n\nMaintained by [Vamshi Krishna Adam](https://github.com/vams2krish).\n\nNo software license is currently included in this repository. Public visibility alone does not grant an open-source license. Dataset licensing must also be confirmed separately.\n",
+      "pushedAt": "2026-11-15T18:37:56Z",
+      "readme": "# Zoo Atlas · ML Zoo Animal Classification\n\n**[Open the live classifier on Vercel](https://ml-zoo-animal-classification.vercel.app)**\n\nZoo Atlas is an interactive field lab for supervised machine learning. Set 16 observable traits or choose an example specimen, then classify it into one of seven animal groups. Each prediction shows the closest reference specimens and the winning share of the weighted vote.\n\n![Zoo Atlas desktop landing page](docs/screenshots/01-desktop-home.jpg)\n\n## Try the product\n\n1. Open **Classifier** and choose an example such as Flamingo or Tuna, or enter a custom set of traits.\n2. Select **Classify specimen** to see the predicted group, vote share, and matching records.\n3. Change a trait to invalidate the old prediction. **Reset** returns the editor to its initial state.\n4. Open **Field notes** for the classification flow, class distribution, and evaluation comparison.\n5. Select **?** beside a trait or component for its meaning, examples, and allowed values where applicable.\n\nThe vote share describes agreement among voting neighbors. It is not a calibrated probability. Example specimens come from the reference data, so their demo predictions are not a measure of generalization.\n\n## Screenshot gallery\n\nThe screenshots were captured from the running product using Playwright. The wildlife artwork in the hero was AI generated; the interface shown is the actual application.\n\n| Bird prediction | Fish prediction |\n| --- | --- |\n| ![Flamingo traits and bird classification](docs/screenshots/02-bird-prediction.jpg) | ![Tuna traits and fish classification](docs/screenshots/03-fish-prediction.jpg) |\n\n![Field notes showing animal groups and validation](docs/screenshots/04-field-notes.jpg)\n\n| Mobile home | Mobile prediction |\n| --- | --- |\n| <img src=\"docs/screenshots/05-mobile-home.jpg\" width=\"300\" alt=\"Zoo Atlas mobile landing page\"> | <img src=\"docs/screenshots/06-mobile-result.jpg\" width=\"300\" alt=\"Mammal prediction for a custom specimen on mobile\"> |\n\n| Leg count help | Weighted vote help |\n| --- | --- |\n| ![Leg count help with allowed values](docs/screenshots/07-trait-help.jpg) | ![Weighted vote help showing its range](docs/screenshots/08-weighted-vote-help.jpg) |\n\n## Dataset and model\n\nThe bundled [UCI Zoo dataset](https://archive.ics.uci.edu/dataset/111/zoo) contains 101 records, 16 input features, and seven labels: mammal, bird, reptile, fish, amphibian, insect, and other invertebrate. The legacy CSV matches the official feature and animal-name rows but omits the class label. The current product uses the official class label and treats the animal name as a record identifier.\n\nThe browser runs weighted K-nearest neighbors with a cutoff of three. A binary mismatch adds one to squared distance; leg-count differences are divided by eight before squaring. All neighbors tied at the cutoff are included. Each gets a vote of one divided by one plus squared distance. Class ties use the nearest contributor, then the numeric class label. One shared implementation handles interactive predictions and evaluation.\n\nGrouped leave-one-out evaluation classified **93 of 101 records correctly (92.1%)**, compared with **41 of 101 (40.6%)** for a majority-class baseline. The evaluation excludes every record with the same name as the test specimen, including both frog records. On this dataset, recall was lowest for reptiles (3/5) and other invertebrates (7/10). This is a benchmark on a small reference dataset, not an independent test on new populations or a species identification result.\n\nThe UCI catalog credits Richard Forsyth and licenses the Zoo dataset under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Dataset DOI: [10.24432/C5R59V](https://doi.org/10.24432/C5R59V). No separate software license has been declared.\n\n## Design system\n\n| Token | Color | Use |\n| --- | --- | --- |\n| Canvas | #FAF4E8 | Page and input backgrounds |\n| Surface | #FFFAF1 | Panels and reference cards |\n| Raised surface | #E7EFE3 | Active trait controls |\n| Ink | #20372F | Primary text |\n| Muted ink | #465E51 | Descriptions and secondary labels |\n| Teal | #176457 | Primary actions, selected states, predictions |\n| Terracotta | #A3432B | Keyboard focus and section labels |\n| Border | #A49D87 | Panel and control outlines |\n\nThe interface uses system typography, grouped native form controls, clear focus rings, and a live region for prediction updates. The two-panel desktop workspace stacks on mobile. The design tokens are defined in [web/style.css](web/style.css).\n\n## Run and test locally\n\nRequires Node.js 22 or newer and Python 3 for the local static server. Browser tests use Microsoft Edge.\n\n    npm ci\n    npm run build\n    python -m http.server 8765 --bind 127.0.0.1 --directory dist\n\nOpen [localhost:8765](http://127.0.0.1:8765). Stop the local server before running the browser suite, which starts its own server on the same port.\n\n    npm test\n    npm run test:e2e\n\nModel tests cover dataset labels, unseen animal names, invalid inputs, distance ties, and benchmark accounting. Browser tests cover initial loading, presets, predicted labels, neighbor explanations, edits, reset, field notes, mobile custom input, and dataset request failure. They also refresh the eight gallery images.\n\n[vercel.json](vercel.json) configures the static build and its output directory for deployment. No API keys, backend, or serialized model are needed by the app.\n\n- [web](web) — UI, model, and labeled CSV\n- [tests](tests) — model and product verification\n- [docs/screenshots](docs/screenshots) — desktop and mobile gallery\n- [archive/legacy](archive/legacy) — historical Streamlit prototype and original notebook/model; kept for reference\n",
       "images": [
         {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/01-desktop-home.jpg",
+          "alt": "Zoo Atlas desktop landing page"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/02-bird-prediction.jpg",
+          "alt": "Flamingo traits and bird classification"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/03-fish-prediction.jpg",
+          "alt": "Tuna traits and fish classification"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/04-field-notes.jpg",
+          "alt": "Field notes showing animal groups and validation"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/05-mobile-home.jpg",
+          "alt": "Zoo Atlas mobile landing page"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/06-mobile-result.jpg",
+          "alt": "Mammal prediction for a custom specimen on mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/07-trait-help.jpg",
+          "alt": "Leg count help with allowed values"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/screenshots/08-weighted-vote-help.jpg",
+          "alt": "Weighted vote help showing its range"
+        },
+        {
           "url": "https://raw.githubusercontent.com/vams2krish/ML-Zoo-Animal-Classification/main/docs/images/zoo-cover.png",
-          "alt": "Wildlife cover featuring a variety of animals"
+          "alt": "zoo cover"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://ml-zoo-animal-classification.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": [
+        "docs/screenshots/01-desktop-home.jpg",
+        "docs/screenshots/02-bird-prediction.jpg",
+        "docs/screenshots/03-fish-prediction.jpg",
+        "docs/screenshots/04-field-notes.jpg",
+        "docs/screenshots/05-mobile-home.jpg",
+        "docs/screenshots/06-mobile-result.jpg",
+        "docs/screenshots/07-trait-help.jpg",
+        "docs/screenshots/08-weighted-vote-help.jpg",
+        "docs/images/zoo-cover.png"
+      ]
     },
     {
       "name": "network-systems-duetsync",
@@ -1058,6 +1710,22 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/network-systems-duetsync/main/docs/showcase/03-file-matching.png",
           "alt": "A mismatched audio fingerprint blocks shared playback"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/network-systems-duetsync/main/docs/showcase/04-ready-together.png",
+          "alt": "Verified audio and both listeners ready"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/network-systems-duetsync/main/docs/showcase/06-reconnection.png",
+          "alt": "Playback pauses while a reserved session reconnects"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/network-systems-duetsync/main/docs/showcase/07-mobile.png",
+          "alt": "DuetSync mobile listening room"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/network-systems-duetsync/main/docs/project-preview.png",
+          "alt": "project preview"
         }
       ],
       "liveLinks": [
@@ -1067,6 +1735,16 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-welcome.png",
+        "docs/showcase/02-invitation.png",
+        "docs/showcase/03-file-matching.png",
+        "docs/showcase/04-ready-together.png",
+        "docs/showcase/05-synchronized-playback.png",
+        "docs/showcase/06-reconnection.png",
+        "docs/showcase/07-mobile.png",
+        "docs/project-preview.png"
       ]
     },
     {
@@ -1105,6 +1783,18 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/networking-togetherplay/main/docs/showcase/04-partner-view.png",
           "alt": "Partner view with host permissions enforced"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/networking-togetherplay/main/docs/showcase/05-mobile-room.png",
+          "alt": "TogetherPlay mobile layout"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/networking-togetherplay/main/docs/showcase/06-video-playback.png",
+          "alt": "Shared video playback"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/networking-togetherplay/main/docs/showcase/07-room-capacity.png",
+          "alt": "Two-person room capacity enforced in a third browser"
         }
       ],
       "liveLinks": [
@@ -1114,6 +1804,15 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-desktop-room.png",
+        "docs/showcase/02-coordinated-readiness.png",
+        "docs/showcase/03-playing-together.png",
+        "docs/showcase/04-partner-view.png",
+        "docs/showcase/05-mobile-room.png",
+        "docs/showcase/06-video-playback.png",
+        "docs/showcase/07-room-capacity.png"
       ]
     },
     {
@@ -1163,6 +1862,11 @@
           "access": "public",
           "availability": "available"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase-create.jpg",
+        "docs/showcase-room.jpg",
+        "docs/showcase-wallet.jpg"
       ]
     },
     {
@@ -1176,26 +1880,21 @@
       "fork": false,
       "archived": false,
       "homepage": null,
-      "readme": "# PortfolioBot ☺\n\n**Vamshi Krishna Adam’s personal portfolio, with an AI sidekick that has done the reading.**\n\nA minimal, playful portfolio that combines an illustrated project gallery, a local retrieval-augmented AI chat, and a direct path to a real conversation. Visitors can explore public GitHub projects, ask questions grounded in project documentation, or book a 30-minute discovery call.\n\n![PortfolioBot desktop preview featuring Vamshi Krishna Adam’s headshot](docs/assets/portfolio-hero.png)\n\n[Meet the builder](https://linkedin.com/in/adamvamshikrishna) · [Explore the code](https://github.com/vams2krish) · [Book a 30-minute hello](https://calendly.com/adam-vamshikrishna/vamshi-intro-meeting-30-mins-chat)\n\n## What it does\n\n- **Personal introduction:** a human-first hero featuring Vamshi’s supplied headshot, about section, skills, contact details, and an AI chat sidekick. The portrait is cropped responsively with CSS; the source photo is preserved.\n- **Project destinations:** every project has a source link. Published homepage and README URLs add app, hosted-preview, or Colab notebook links to cards and detail dialogs. Owner-private previews are labeled as requiring sign-in; no deployment is invented for source-only projects.\n- **GitHub project gallery:** all public repositories imported from `vams2krish`, with searchable descriptions, category filters, actual repository images, detail galleries, and repository links.\n- **Ask about a project:** each card and detail popup has an **Ask my AI Avatar** button. It opens the chat, automatically asks for an explanation, and scopes retrieval and follow-up questions to that project's README. Clear the project context to return to general portfolio questions.\n- **Automatic updates:** the running server refreshes GitHub every five minutes, open browsers update their gallery every minute, and GitHub Actions refreshes the committed snapshot every 30 minutes.\n- **Grounded AI chat:** a local Ollama model answers using retrieved profile information and public GitHub README excerpts. Responses include source labels and repository links.\n- **Discovery-call booking:** meeting and booking questions return a validated Calendly button immediately, without waiting for model inference.\n- **Optional local image generation:** AUTOMATIC1111 can generate an abstract avatar through its Stable Diffusion API. The CSS mascot works without it.\n- **Honest fallback:** if Ollama is unavailable or times out, the chat shows clearly identified source excerpts instead of presenting them as AI-generated answers.\n- **A little goofiness:** fictional desk-object reviews have varied star ratings and explicit demo labels. They are excluded from factual retrieval.\n- **Responsive layout:** desktop and mobile designs, keyboard-accessible controls, reduced-motion support, and native project dialogs.\n\n## Project photos\n\nThese are screenshots of the running application. In the live gallery, project images come from public GitHub READMEs and can include screenshots, charts, sample outputs, and diagrams. Projects without a usable image show a labeled illustrated cover instead.\n\nThe sync checks Markdown and HTML image references, resolves repository-relative paths, and validates image availability. Badges, logos, comments, unrelated external hosts, and broken images are excluded. Up to four images per repository appear in its detail popup; click a thumbnail to change the large preview. Image discovery runs with every automatic GitHub refresh. Images load directly from their GitHub URLs, with local illustrated fallbacks if loading fails.\n\nApp links are imported from GitHub's repository homepage field and explicit deployment links in READMEs. Recognized hosts include Vercel, Heroku, Netlify, Render, Railway, Streamlit, GitHub Pages, and Sites. Known public deployment hosts are checked for an HTTP response: missing or failed deployments remain clickable but are marked **Currently unavailable**. A successful response is an availability check, not a complete product test. Private previews retain their existing access controls. Replace `public/assets/vamshi-headshot.jpg` to update the portrait; the original image is positioned with CSS in `public/portrait.css`.\n\n![Project showcase with source images and Ask my AI Avatar buttons](docs/assets/project-showcase.png)\n\n<details>\n<summary>Project explanation in the AI avatar chat</summary>\n\n![AI avatar chat opened from a project card with project-specific sources](docs/assets/project-avatar-chat.png)\n\n</details>\n\n<details>\n<summary>Full desktop page</summary>\n\n![Full desktop portfolio, including projects, about, demo reviews, and contact](docs/assets/portfolio-desktop.png)\n\n</details>\n\n<details>\n<summary>Mobile page</summary>\n\n<img src=\"docs/assets/portfolio-mobile.png\" width=\"390\" alt=\"PortfolioBot mobile layout with stacked project cards and contact section\">\n\n</details>\n\n## Quick start\n\n**Requirements:** Node.js 20+ and, for generated chat answers, a running local Ollama installation with a chat model. There are no npm runtime dependencies and no build step.\n\n```bash\ngit clone https://github.com/vams2krish/PortfolioBot.git\ncd PortfolioBot\nnpm start\n```\n\nOpen **http://127.0.0.1:4175**. Browsing projects, viewing contact details, and booking a call work without Ollama.\n\nTo prepare the preferred chat model in a separate terminal:\n\n```bash\nollama pull llama3.2\nollama serve\n```\n\nIf the Ollama desktop app is already serving, another `ollama serve` process is unnecessary.\n\n## Configuration\n\nSet environment variables in the shell before starting the server:\n\n| Variable | Default | Purpose |\n| --- | --- | --- |\n| `PORT` | `4175` | Local web-server port |\n| `OLLAMA_URL` | `http://127.0.0.1:11434` | Ollama API base URL |\n| `OLLAMA_MODEL` | Automatic local selection | Override the chat model |\n| `AUTOMATIC1111_URL` | `http://127.0.0.1:7860` | AUTOMATIC1111 API base URL |\n| `GITHUB_AUTO_SYNC` | `true` | Set to `false` to disable the running server's GitHub refresh |\n| `GITHUB_SYNC_INTERVAL_SECONDS` | `300` | Runtime refresh interval, with a minimum of 60 seconds |\n\nPowerShell example:\n\n```powershell\n$env:PORT = '4175'\n$env:OLLAMA_URL = 'http://127.0.0.1:11434'\n$env:OLLAMA_MODEL = 'llama3.2:latest'\n$env:AUTOMATIC1111_URL = 'http://127.0.0.1:7860'\nnpm start\n```\n\nAutomatic selection prefers installed `llama3.2:latest`, then `qwen2.5:7b`, then another eligible local model. Cloud-backed, embedding, OCR, and vision-named models are excluded from automatic selection. Choose a model your hardware can load.\n\n`.env.example` documents the settings. The application **does not automatically load `.env` files**; export settings in your shell. No OpenAI key or paid API is needed.\n\n## How the retrieval chat works\n\n```text\nVisitor question\n      │\n      ├─ Booking/contact request ──► profile details + Calendly button\n      │\n      ▼\nProfile + GitHub metadata + README chunks\n      │\n      ▼\nKeyword relevance scoring → top 5 source passages\n      │\n      ▼\nLocal Ollama chat model → answer + source links\n      │\n      └─ Inference fails → explicitly labeled direct excerpts\n```\n\n`retrieval.mjs` turns the profile, project summaries, and README chunks into searchable documents. It removes common stop words, scores matching words and source titles, and selects five passages for the model context. README chunks are approximately 1,400 characters.\n\nThis is **lightweight lexical RAG**: it does not use embeddings, a vector database, or semantic reranking. It is easy to inspect and runs without an indexing service. The prompt tells the model to use only the supplied context, avoid inventing facts, and treat retrieved text as data rather than instructions. These instructions reduce unsupported answers but do not guarantee accuracy.\n\nQuestions are standalone; conversation history is not currently sent to the model. Source labels show the retrieved passages, rather than a verified citation for every generated claim.\n\n## GitHub import\n\nThe portfolio automatically discovers **all currently public repositories** from `vams2krish`. The gallery shows the latest repository total and refresh status. The table below highlights the original project collection; the live gallery includes subsequent additions too.\n\n| Project | Focus |\n| --- | --- |\n| [ResearchPal](https://github.com/vams2krish/ResearchPal) | Local research-paper reading, AI explanations, synthesis, and flashcards |\n| [MathBlitz](https://github.com/vams2krish/MathBlitz) | Practical math exercises with a FastAPI backend |\n| [ClariSEE](https://github.com/vams2krish/ClariSEE) | Text-to-diagram, quiz, and summary experiences in Flutter |\n| [PDRides](https://github.com/vams2krish/PDRides) | Community carpooling with messaging bots |\n| [OCR](https://github.com/vams2krish/OCR) | Text extraction from images and PDF documents |\n| [Books Recommendation System](https://github.com/vams2krish/Books-Recommendation-system) | Collaborative filtering and nearest-neighbor recommendations |\n| [Zoo Animal Classification](https://github.com/vams2krish/Zoo-Animal-Classification-ML) | Animal-feature classification and exploratory analysis |\n| [Kidney Prediction](https://github.com/vams2krish/Kidney-prediction-deep-learning) | Deep-learning image-classification project |\n| [Image Classification](https://github.com/vams2krish/Image-Classification) | Neural networks and TensorFlow data pipelines |\n| [Boston Housing Regression](https://github.com/vams2krish/Boston-Housing-Price-Linear-Regression) | Linear-regression learning project and interactive predictions |\n| [simple-browser](https://github.com/vams2krish/simple-browser) | Public repository without a published description or README at initial import |\n\nUpdates happen automatically:\n\n- **While the app runs:** it checks GitHub on startup and every five minutes. Newly public repositories, descriptions, languages, topics, stars, archived/fork status, push timestamps, and README changes flow into both the gallery and the AI context. Private repositories are excluded, and deleted or newly private repositories disappear after a successful refresh.\n- **While the app is off:** `.github/workflows/sync-portfolio.yml` checks every 30 minutes and commits changed snapshots and cover art to `main`. GitHub may delay scheduled workflows. This keeps the repository ready for the next clone or deployment; it does not start your local server or pull commits into an existing checkout.\n- **In an open browser:** the gallery checks the server every minute and when the tab becomes visible. Active filters and searches are preserved.\n\nChanges usually appear within about six minutes while the app is running, plus network/import time. This uses polling rather than instant GitHub webhooks. The knowledge base includes repository metadata and README text, not an index of every source file.\n\nTo refresh immediately:\n\n```bash\nnpm run sync:github\n```\n\nThe shared sync service follows every public-repository page, fetches available README files, and regenerates local SVG cover art. Public GitHub API rate limits apply; no personal token is required. Data is saved in the single `data/github-snapshot.json` file. New covers are prepared first, then the snapshot is replaced atomically so requests see a complete version. On GitHub failure, timeout, or rate limiting, the last successful snapshot remains available. Refreshes are deduplicated within the server, and retries respect GitHub's rate-limit reset time. README imports are capped at 16,000 characters per repository.\n\nThe workflow commits only when imported content changes. PortfolioBot's own push timestamp is excluded to prevent a loop of commits caused by the sync bot itself. The workflow uses the repository's built-in Actions token for commits; it does not store a personal GitHub credential. Check its run history under the repository's **Actions** tab, or run it manually with **Run workflow**.\n\n## Make it your own\n\nEdit `profile.json` to update:\n\n- Name, role, location, biography, experience, and skills.\n- Email, phone number, LinkedIn, GitHub, and HTTPS Calendly link.\n- Additional manually curated projects and reviews.\n\nThe server reads profile and snapshot data on each request. The gallery updates automatically after successful syncs; reload for manual biography or contact edits. Edit `github.mjs` for categories, ordering, and fallback descriptions. Current GitHub descriptions take precedence over curated fallback descriptions. Update `public/style.css` and `public/playful.css` for layout and visual styling. Restart the server after changing the GitHub username or environment settings.\n\nFor a real approved testimonial, use:\n\n```json\n{\n  \"quote\": \"An approved quote from a real collaborator.\",\n  \"name\": \"Collaborator name\",\n  \"role\": \"Their role or relationship\",\n  \"rating\": 5,\n  \"demo\": false\n}\n```\n\nThe current homepage review heading and disclosure deliberately describe fictional demo reviews. Update that page copy as well when replacing the section with genuine testimonials.\n\n## Optional AUTOMATIC1111 avatar\n\nStart AUTOMATIC1111 with API access enabled (`--api`) and a checkpoint selected, then run:\n\n```powershell\nInvoke-RestMethod -Method Post http://127.0.0.1:4175/api/avatar\n```\n\nThe endpoint requests a 512×512 abstract image, saves it to `public/generated/avatar.png`, and returns its local URL. Generated images are ignored by Git. This creates abstract artwork, not a portrait of Vamshi. The homepage now keeps the supplied real headshot as its primary image; generating abstract artwork does not replace it.\n\nThe current hero screenshot shows Vamshi’s supplied headshot; some earlier screenshots retain the original CSS sidekick. The AUTOMATIC1111 integration is implemented, but live generation has not been verified because the service was offline during development.\n\n## API reference\n\n| Method | Endpoint | Behavior |\n| --- | --- | --- |\n| `GET` | `/api/profile` | Public profile and merged project metadata; omits README bodies |\n| `GET` | `/api/status` | Ollama and AUTOMATIC1111 availability and installed Ollama model names |\n| `POST` | `/api/chat` | Accepts `{\"message\":\"What is ResearchPal?\"}`; returns a grounded answer or explicit excerpt fallback |\n| `POST` | `/api/avatar` | Requests local image generation and saves the returned avatar |\n\nChat questions are limited to 2,000 characters. Ollama inference has a 120-second timeout, and avatar generation has a 180-second timeout. The contact and booking path skips inference.\n\n## Project structure\n\n```text\nPortfolioBot/\n├── server.mjs                 # Local HTTP server and model integrations\n├── retrieval.mjs              # Source documents, chunking, ranking, booking validation\n├── github.mjs                 # GitHub snapshot loading and gallery summaries\n├── github-sync.mjs            # Automatic refresh, safe snapshot replacement, retries\n├── profile.json               # Personal details and editable content\n├── data/\n│   └── github-snapshot.json   # Public metadata and README text in one snapshot\n├── public/\n│   ├── index.html             # Portfolio and chat interface\n│   ├── app.js                 # Gallery, filters, dialogs, and chat interactions\n│   ├── style.css              # Base layout and responsive styles\n│   ├── playful.css            # Playful visual treatment and CSS mascot\n│   └── assets/projects/       # Generated SVG project-cover illustrations\n├── scripts/\n│   ├── sync-github.mjs        # Paginated public repository and README import\n│   └── create-covers.mjs      # Local cover-art generation\n├── test/                     # Retrieval, snapshot, and booking tests\n└── docs/assets/               # Actual desktop and mobile screenshots\n```\n\n## Validation\n\n```bash\nnpm test\n```\n\nAutomated tests cover source ranking, README retrieval and links, complete project-list retrieval, exclusion of fictional reviews, booking intent, Calendly URL validation, cover/knowledge coverage, paginated discovery, changed/new/removed/private repositories, unc",
+      "readme": "# PortfolioBot\n\nVamshi Krishna Adam’s project portfolio, with GitHub-powered project discovery and an assistant grounded in public project documentation.\n\n[Live portfolio on Vercel](https://portfoliobot-nine.vercel.app/) · [Source on GitHub](https://github.com/vams2krish/PortfolioBot) · [Import into Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvams2krish%2FPortfolioBot)\n\n![Portfolio homepage](docs/assets/portfolio-hero.png)\n\n| Product view | Screenshot |\n| --- | --- |\n| Project gallery | [Browse projects](docs/assets/project-showcase.png) |\n| Project detail | [Screenshots and deployment links](docs/assets/project-details.png) |\n| Project assistant | [Scoped answer with sources](docs/assets/project-avatar-chat.png) |\n| Contact | [Booking and contact links](docs/assets/contact.png) |\n| Mobile | [Responsive homepage](docs/assets/portrait-mobile.png) |\n\n## Run locally\n\nRequires Node.js 20+. Run `npm start` and open http://127.0.0.1:4175/. Run `npm test` for automated tests and `npm run sync:github` to refresh the project snapshot manually.\n\nOllama is optional. When available, the local assistant answers using retrieved portfolio context; otherwise it shows relevant excerpts and source links. Configure `OLLAMA_URL` and optionally `OLLAMA_MODEL` in the process environment. The local-only image endpoint uses `AUTOMATIC1111_URL` and saves generated output separately from the supplied headshot.\n\n## Deploy to Vercel\n\nImport this repository using the link above. The project serves static assets from `public/` and API routes from `api/`. Hosted mode uses source excerpts and booking links without connecting to the local Ollama or image server. The hosted snapshot comes from the deployed Git revision; GitHub Actions can refresh it, and a Git-connected deployment picks up subsequent commits.\n\n## Product flows\n\n- Search and filter the gallery; select a project to browse its available images.\n- Open the source repository, a hosted demo, or a notebook when available. Owner-only previews and unavailable endpoints are labeled.\n- Ask the assistant about a selected project. Follow-up questions stay scoped to that project until the scope is cleared.\n- Book a call through Calendly or use the contact links.\n\n## Design and data\n\nThe palette in `public/design.css` uses navy backgrounds, layered slate surfaces, lavender for primary actions, and mint for focus and accents. Shared tokens cover color, spacing, and corner radii. Older styling files provide the base layout. The UI adapts to mobile and respects reduced-motion settings.\n\nPersonal details are in `profile.json`. Public repository metadata, README excerpts, image references, and deployment links are stored in `data/github-snapshot.json`. The local server can refresh the snapshot on an interval; GitHub Actions maintains the repository copy. When GitHub is unavailable, the last good snapshot remains in use.\n\n## API\n\n| Method | Route | Purpose |\n| --- | --- | --- |\n| GET | `/api/profile` | Public profile and project gallery |\n| GET | `/api/status` | Local service or hosted mode status |\n| POST | `/api/chat` | Question with optional project context |\n| POST | `/api/avatar` | Optional local image generation |\n\nBrowser checks cover the gallery, search, project details, deployment links, scoped chat, Calendly links, and mobile width. The screenshot gallery shows the application running in hosted fallback mode.\n",
       "images": [
         {
           "url": "https://raw.githubusercontent.com/vams2krish/PortfolioBot/main/docs/assets/portfolio-hero.png",
-          "alt": "PortfolioBot desktop preview featuring Vamshi Krishna Adam’s headshot"
-        },
-        {
-          "url": "https://raw.githubusercontent.com/vams2krish/PortfolioBot/main/docs/assets/project-showcase.png",
-          "alt": "Project showcase with source images and Ask my AI Avatar buttons"
-        },
-        {
-          "url": "https://raw.githubusercontent.com/vams2krish/PortfolioBot/main/docs/assets/project-avatar-chat.png",
-          "alt": "AI avatar chat opened from a project card with project-specific sources"
-        },
-        {
-          "url": "https://raw.githubusercontent.com/vams2krish/PortfolioBot/main/docs/assets/portfolio-desktop.png",
-          "alt": "Full desktop portfolio, including projects, about, demo reviews, and contact"
+          "alt": "Portfolio homepage"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [
+        {
+          "url": "https://portfoliobot-nine.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ]
     },
     {
       "name": "ResearchPal",
@@ -1226,9 +1925,47 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/live/question.png",
           "alt": "Live answer grounded in the imported document"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/live/studio.png",
+          "alt": "Editable storyboard generated with Ollama"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/live/models.png",
+          "alt": "Separate text and embedding model settings"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/live/mobile.png",
+          "alt": "ResearchPal mobile document reader at 390 pixels"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/researchpal-settings.png",
+          "alt": "Task-specific model configuration"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/researchpal-library.png",
+          "alt": "researchpal library"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/ResearchPal/main/docs/images/researchpal-mobile.png",
+          "alt": "researchpal mobile"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/live/library.png",
+        "docs/images/live/mobile.png",
+        "docs/images/live/models.png",
+        "docs/images/live/question.png",
+        "docs/images/live/reader.png",
+        "docs/images/live/studio.png",
+        "docs/images/live/study.png",
+        "docs/images/researchpal-library.png",
+        "docs/images/researchpal-mobile.png",
+        "docs/images/researchpal-reader.png",
+        "docs/images/researchpal-settings.png",
+        "docs/images/researchpal-studio.png"
+      ]
     },
     {
       "name": "SkullBot-GenAI-Writing-Studio",
@@ -1267,6 +2004,30 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/04-humanizer.jpg",
           "alt": "Humanizer running the local deterministic mode"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/05-summarizer.jpg",
+          "alt": "Summarizer showing a condensed classroom example"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/06-turnitoff.jpg",
+          "alt": "TurnitOFF protected editing and change audit"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/12-documents.jpg",
+          "alt": "Mixed-project ZIP processing with per-file audits"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/07-zippy.jpg",
+          "alt": "ZipPy descriptive text measurements"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/08-similarity.jpg",
+          "alt": "08 similarity"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/SkullBot-GenAI-Writing-Studio/main/docs/showcase/09-ai-detector.jpg",
+          "alt": "09 ai detector"
         }
       ],
       "liveLinks": [
@@ -1275,6 +2036,20 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "docs/showcase/01-chat.jpg",
+        "docs/showcase/02-paraphraser.jpg",
+        "docs/showcase/03-grammar.jpg",
+        "docs/showcase/04-humanizer.jpg",
+        "docs/showcase/05-summarizer.jpg",
+        "docs/showcase/06-turnitoff.jpg",
+        "docs/showcase/07-zippy.jpg",
+        "docs/showcase/08-similarity.jpg",
+        "docs/showcase/09-ai-detector.jpg",
+        "docs/showcase/10-citations.jpg",
+        "docs/showcase/11-apa.jpg",
+        "docs/showcase/12-documents.jpg"
       ]
     },
     {
@@ -1306,9 +2081,40 @@
         {
           "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/demo-reader.jpg",
           "alt": "Story reader with Mira's generated adventure and narration and PDF controls"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/demo-rewards.jpg",
+          "alt": "Reading rewards with the first sticker unlocked"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/demo-bookshelf.jpg",
+          "alt": "Bookshelf with a completed three-chapter adventure and an unfinished story"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/demo-print.jpg",
+          "alt": "A5 print preview showing the first chapter and page number"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/demo-print-cover.jpg",
+          "alt": "A5 PDF cover with a moonlit forest and fox, generated by Automatic1111"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/StoryTime/main/docs/images/storytime-preview.png",
+          "alt": "storytime preview"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": [
+        "docs/images/demo-bookshelf.jpg",
+        "docs/images/demo-create.jpg",
+        "docs/images/demo-heroes.jpg",
+        "docs/images/demo-home.jpg",
+        "docs/images/demo-print-cover.jpg",
+        "docs/images/demo-print.jpg",
+        "docs/images/demo-reader.jpg",
+        "docs/images/demo-rewards.jpg",
+        "docs/images/storytime-preview.png"
+      ]
     },
     {
       "name": "VentureLink",
@@ -1335,6 +2141,9 @@
           "type": "app",
           "access": "owner-private"
         }
+      ],
+      "screenshotPaths": [
+        "docs/images/venturelink-preview.jpg"
       ]
     },
     {
@@ -1356,7 +2165,8 @@
           "alt": "Godtech pilgrimage map and sanctuary discovery interface"
         }
       ],
-      "liveLinks": []
+      "liveLinks": [],
+      "screenshotPaths": []
     }
   ]
 }
