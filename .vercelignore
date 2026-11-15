@@ -1,0 +1,6 @@
+.git
+docs
+test
+node_modules
+.env*
+public/generated

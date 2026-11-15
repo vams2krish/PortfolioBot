@@ -9,8 +9,8 @@ function projectLinks(project,container){
  if(!project.liveLinks?.length)container.append(el('span','No hosted demo listed','source-only'));
 }
 function renderProjects(){
- const query=$('#project-search').value.toLowerCase().trim();
- const filtered=profile.projects.filter(p=>(category==='All'||p.category===category)&&`${p.title} ${p.description} ${p.tags.join(' ')}`.toLowerCase().includes(query));
+ const query=$('#project-search').value.toLowerCase().trim().replace(/[-_]+/g,' ');
+ const filtered=profile.projects.filter(p=>(category==='All'||p.category===category)&&`${p.title} ${p.description} ${p.tags.join(' ')}`.toLowerCase().replace(/[-_]+/g,' ').includes(query));
  $('#projects').replaceChildren();$('#project-count').textContent=`${filtered.length} of ${profile.projects.length} projects`;$('#empty-projects').hidden=filtered.length!==0;
  filtered.forEach(p=>{
   const article=el('article',null,'project');const button=el('button');button.setAttribute('aria-label',`Explore ${p.title}`);
@@ -56,13 +56,12 @@ $('#close-project').onclick=()=>$('#project-dialog').close();
 $('#project-dialog').addEventListener('toggle',()=>{if($('#project-dialog').open&&selectedProject){$('#detail-live-links').replaceChildren();projectLinks(selectedProject,$('#detail-live-links'));}});
 $('#project-dialog').addEventListener('click',e=>{if(e.target===$('#project-dialog'))$('#project-dialog').close();});
 async function load(){
- profile=await fetch('/api/profile').then(r=>r.json());
+ profile=await fetch('/api/profile').then(r=>{if(!r.ok)throw Error('Portfolio unavailable');return r.json();});
  document.title=`${profile.name} — Portfolio`;
  document.querySelectorAll('[data-name]').forEach(n=>n.textContent=profile.name);$('[data-role]').textContent=profile.role.toLowerCase();
  $('#bio').textContent=profile.bio;$('#experience').textContent=profile.experience;
  profile.skills.forEach(s=>$('#skills').append(el('span',s)));
  $('#project-search').addEventListener('input',renderProjects);renderGitHub();
- if(profile.testimonials.length){profile.testimonials.forEach(t=>{const item=el('article',null,'review-card');const rating=Math.min(5,Math.max(1,Math.round(t.rating||5)));const stars=el('div','★'.repeat(rating)+'☆'.repeat(5-rating),'review-stars');stars.setAttribute('aria-label',`${rating} out of 5 stars`);item.append(el('span',t.demo?'FICTIONAL DEMO REVIEW':'COLLABORATOR REVIEW','review-label'),stars,el('blockquote',`“${t.quote}”`),el('p',`${t.name} · ${t.role}`,'quote-credit'));$('#testimonials').append(item);});}else{$('#testimonials').append(el('p','Real collaborator quotes will appear here.'));}
  for(const [label,url] of [['GitHub',profile.githubUrl],['LinkedIn',profile.linkedinUrl]]){const href=safeLink(url);if(href){const a=el('a',`${label} ↗`);a.href=href;a.target='_blank';a.rel='noopener noreferrer';$('#social-links').append(a);}}
  if(profile.phone){const a=el('a',`${profile.phone} (USA)`);a.href=`tel:${profile.phone.replace(/[^+\d]/g,'')}`;$('#social-links').append(a);}
  let valid=false;try{const u=new URL(profile.calendlyUrl);valid=u.protocol==='https:'&&(u.hostname==='calendly.com'||u.hostname.endsWith('.calendly.com'));}catch{}
@@ -75,8 +74,8 @@ async function send(text,{replace=false}={}){if($('#send').disabled&&!replace)re
 $('#chat-form').onsubmit=e=>{e.preventDefault();const q=$('#question').value.trim();if(q)send(q);};
 document.querySelectorAll('.suggestions button').forEach(b=>b.onclick=()=>send(b.textContent));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#chat').hidden)$('#close-chat').click();});
-load().catch(()=>{$('#bio').textContent='Could not load the portfolio. Please refresh.';});
+load().catch(()=>{$('#github-summary').textContent='Could not load projects. Refresh to try again.';});
 setInterval(refreshPortfolio,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshPortfolio();});
-fetch('/api/status').then(r=>r.json()).then(s=>{$('#model-status').textContent=s.ollama?'Powered by local Ollama':'Local AI offline';}).catch(()=>$('#model-status').textContent='Local AI offline');
+fetch('/api/status').then(r=>r.json()).then(s=>{$('#model-status').textContent=s.hosted?'Portfolio sources mode':s.ollama?'Powered by local Ollama':'Portfolio sources mode';}).catch(()=>$('#model-status').textContent='Local AI offline');
 if($('#avatar-art')){const generated=new Image();generated.onload=()=>{generated.className='generated-avatar';generated.alt='Locally generated abstract AI avatar';$('#avatar-art').replaceChildren(generated);};generated.src='/generated/avatar.png';}

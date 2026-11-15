@@ -8,8 +8,6 @@ export function documents(profile) {
       {source:`Project: ${p.title}`,url:p.url,text:`${p.title}. ${p.category}. ${p.description}. ${p.tags.join(', ')}`},
       ...(p.readme?.replace(/<!--[\s\S]*?-->/g,'').match(/[\s\S]{1,1400}/g)||[]).map((text,i)=>({source:`${p.title} README · ${i+1}`,url:p.url,text:`Project ${p.title}. ${text}`}))
     ]),
-    ...profile.testimonials.filter(t=>!t.demo).map(t=>({source:'Testimonial',text:`${t.quote} — ${t.name}, ${t.role}`})),
-    {source:'Review disclosure',text:'The homepage reviews by fictional characters are playful demo content, not real client testimonials or endorsements.'}
   ];
 }
 export function retrieve(question, profile, projectTitle=null) {

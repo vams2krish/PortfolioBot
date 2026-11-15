@@ -1,0 +1,28 @@
+:root {
+  color-scheme:dark;
+  --bg:#0c1020; --surface:#141b30; --raised:#1b2540; --ink:#f3f5ff;
+  --muted:#aebbd5; --line:#303d5d; --accent:#b0a0ff; --green:#70ead3;
+  --radius:18px; --space:8px;
+}
+body{background:radial-gradient(ellipse at 80% 0%,#241c43 0,transparent 36rem),var(--bg);font-family:Manrope,system-ui,sans-serif}
+header{border-bottom:1px solid var(--line);height:78px}nav,.nav-contact{font-size:13px}nav a:hover,.nav-contact:hover,.text-link:hover{color:var(--green)}
+.brand i,.hero-doodle,.about-mark,.contact h2>span,.ticker b{color:var(--green)}
+.hero h1{font-weight:800;font-size:clamp(45px,7vw,92px);letter-spacing:-.075em}
+h1 em,h2 em{font:inherit;color:var(--accent);letter-spacing:inherit}
+.eyebrow,.hero-foot{color:var(--green);font-size:10px;font-weight:700}.dot{background:var(--green)}
+.hero-copy>p,.section-heading p,.about p,.contact p,.project p,footer,.source-only,.access-note{color:var(--muted)}
+.portrait-card{border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 24px 65px #0006}
+.portrait-card .avatar-caption,.ticker,.contact,.chat-header,.chat-project,.detail-images button{background:var(--surface);border-color:var(--line)}
+.portrait-card .avatar-caption p,.chat-header small{color:var(--muted)}.sticker{background:var(--green);color:var(--bg);border:0}
+.button,.project .ask-project,.live-project,.filter-list button{border-radius:9px;font-weight:700;min-height:42px}
+.primary,#send,.filter-list button[aria-pressed=true]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.primary:hover,.live-project:hover,.project .ask-project:hover{background:var(--green);color:var(--bg)}
+.secondary,.round,.search-box,.project .ask-project,.live-project{background:var(--raised);color:var(--ink);border-color:var(--line)}
+.project{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column}
+.project .project-actions{margin-top:auto;padding-top:14px}.project p{font-size:13px}.project-image img,#detail-image{background:var(--raised)}
+.project-source,.image-type,.project-arrow{color:var(--green)}.image-type,.project-arrow,#close-project{background:var(--bg);border-color:var(--line);color:var(--ink)}
+.chat,.chat-launch,dialog{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius)}
+.assistant,.suggestions button{background:var(--raised);color:var(--ink);border-color:var(--line)}.user{background:#342b5e}.message small,.chat-note,.chat-project button{color:var(--muted)}
+button,input{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--green)}
+.chat[hidden],.chat-project[hidden]{display:none}.chat{max-height:calc(100dvh - 108px)}.messages{min-height:0;overscroll-behavior:contain}
+@media(max-width:650px){.hero h1{letter-spacing:-.06em}.portrait-card{min-height:390px}.project{padding:12px}.chat{max-height:calc(100dvh - 96px)}}
