@@ -2,7 +2,7 @@
 
 Vamshi Krishna Adam’s project portfolio, with GitHub-powered project discovery and an assistant grounded in public project documentation.
 
-[Source on GitHub](https://github.com/vams2krish/PortfolioBot) · [Import into Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvams2krish%2FPortfolioBot)
+[Live portfolio on Vercel](https://portfoliobot-nine.vercel.app/) · [Source on GitHub](https://github.com/vams2krish/PortfolioBot) · [Import into Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvams2krish%2FPortfolioBot)
 
 ![Portfolio homepage](docs/assets/portfolio-hero.png)
 
