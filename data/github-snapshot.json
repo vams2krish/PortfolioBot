@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-11-15T21:52:54.796Z",
+  "syncedAt": "2026-11-16T09:49:10.270Z",
   "owner": "vams2krish",
   "projects": [
     {
@@ -650,6 +650,43 @@
         "docs/showcase-photo-scan.png",
         "docs/showcase-portions.png"
       ]
+    },
+    {
+      "name": "echocall-genai",
+      "description": "EchoCall (GenAI Project) explores consent-led voice conversations for remembrance. Try the fictional browser demo with session controls, synthetic speech, and local transcripts.",
+      "language": "JavaScript",
+      "topics": [],
+      "url": "https://github.com/vams2krish/echocall-genai",
+      "branch": "main",
+      "stars": 0,
+      "fork": false,
+      "archived": false,
+      "homepage": "https://echocall-genai.vercel.app",
+      "pushedAt": "2026-11-16T03:33:25Z",
+      "readme": "# EchoCall (GenAI Project)\n\nEchoCall explores how a disclosed, caller-controlled voice experience could help people reflect on memories. The public prototype is a browser listening room with a fictional companion, scripted replies, optional synthetic speech, and a temporary transcript.\n\n[Open the live Vercel demo](https://echocall-genai.vercel.app)\n\n![EchoCall listening room in plum, rose, and cream](docs/desktop.png)\n\n## Try it\n\n1. Open the live demo or serve this directory with any static HTTP server.\n2. Set a session duration and choose whether to hear replies aloud.\n3. Start the session, read or hear the disclosure, and type a message. Use fictional details when trying the public demo.\n4. End with the button or type **End the call** or **Goodbye for now**. Open the transcript to review it, download it, or delete it.\n\nThe prototype uses HTML, CSS, and JavaScript. Speech playback depends on browser support. The transcript is stored in page memory and clears on reload. Downloaded copies are managed by the user.\n\n## Project type\n\nThe proposed production system is an applied generative AI application. Its language and speech components would use pretrained deep-learning models for speech recognition, conversational inference, and synthesis. The public prototype uses fixed replies and browser speech synthesis. It contains no model training or live language model integration.\n\n## Technical implementation plan\n\n| Component | Proposed production behavior |\n| --- | --- |\n| Voice onboarding | Verify authorization, accept approved reference audio, create an account-bound voice ID, and support provider-side deletion. |\n| Persona and memory | Use documented biographical facts and caller-approved memories. Retrieve relevant context per turn and honor each session’s memory setting. |\n| Outbound calls | Verify the destination, check duration and frequency caps, and stream audio through a telephony provider. |\n| Conversation loop | Stream recognition, language model responses, and synthesis. Cancel queued playback on interruption and measure response latency on real calls against the 800–1,200 ms target. |\n| Session data | Give authorized callers control over transcript and audio access, export, retention, and deletion. Record consent decisions in an audit trail. |\n\nThe browser prototype exercises session controls. The outbound phone mode below implements the first telephony and OpenRouter integration. Voice cloning, persistent memory, account controls, and recording remain planned.\n\n## Ethical constraints\n\nRequire verified authorization and destination consent before dialing. Disclose the simulation at the beginning of every call. Ground responses in supplied source material and prohibit claims of supernatural presence or invented life events. Keep exit controls available throughout the call. Emergency stop should disconnect the session and lock the clone pending reauthorization. In distress or crisis, shift out of character and encourage immediate human support. Allow consent revocation and propagate deletion to storage and providers.\n\n## Screenshots\n\n### Mobile\n\n![Listening room and session controls stacked on mobile](docs/mobile.png)\n\n### Wide desktop\n\n![Listening room and session controls on a wide display](docs/wide.png)\n\n## Outbound phone mode\n\nEchoCall also includes a real outbound PSTN path. Twilio places the call, speaks the disclosure, and waits for keypad consent. After the recipient presses 1, EchoCall transcribes each spoken turn, requests one reply from OpenRouter, and speaks it using Twilio's synthetic voice. Press 9, say “end the call,” or hang up to exit. Calls have a five-minute maximum.\n\n1. Use a Twilio account with full Programmable Voice access and a voice-capable outbound number. The limited trial can ring a verified destination using Twilio test templates, but its outbound Voice API restricts custom webhook URLs and call parameters. Obtain explicit consent from the recipient. See [Twilio Voice trial restrictions](https://www.twilio.com/docs/usage/trials/try-out-voice#make-a-call).\n2. In Vercel project settings, configure production variables `ECHOCALL_ORIGIN` (the exact public HTTPS deployment origin), `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_TO_NUMBER` (the consenting destination in E.164 format), `OPENROUTER_API_KEY`, and `OPENROUTER_MODEL`. Choose a model with a provider that supports zero data retention. Redeploy after setting the variables.\n3. In your local Node.js 22+ environment, set `ECHOCALL_ORIGIN`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_TO_NUMBER`, and `TWILIO_FROM_NUMBER` (your voice-capable Twilio number). Keep these values in private environment variables.\n4. When the recipient expects the call, run `node scripts/call.js --consented`. Twilio returns the call ID and initial state. Use that ID in the Twilio console to confirm delivery.\n\nThe public web page cannot initiate calls. Only the private operator command can dial. The webhook verifies Twilio's signature, account, and destination. EchoCall does not store phone transcripts or enable call recording. Twilio and OpenRouter process call data under their provider settings. Phone mode uses one speech turn at a time and a standard synthetic voice. Streaming conversation, voice cloning, and cross-call memory remain production roadmap items.\n\n## ElevenLabs streaming voice\n\nTwilio places the PSTN call and handles the opening disclosure and keypad consent. After the recipient presses 1, EchoCall registers the call with ElevenLabs, then returns its TwiML to Twilio to bridge the phone audio to the ElevenLabs agent. ElevenLabs handles speech recognition, turn-taking, and voice synthesis. The agent can use its configured model or a separately configured custom LLM.\n\n1. Use a Twilio account with full Programmable Voice access and a voice-capable number. Keep the same operator dialing command and Twilio webhook configuration.\n2. Create an ElevenLabs agent. Set input and output audio to μ-law 8 kHz. Configure a short opening that identifies EchoCall as AI, an end-call tool for requests such as “end the call,” and retention settings appropriate to what you disclose to the recipient.\n3. Choose a stock voice or an Instant Voice Clone in the agent settings. Only upload samples when you can satisfy ElevenLabs’ voice-rights and consent requirements. Professional Voice Cloning is limited to the verified speaker's own voice. Creating and assigning a clone happens in ElevenLabs.\n4. Set production secrets `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID`, plus `ECHOCALL_VOICE_PROVIDER=elevenlabs`, then redeploy. In this mode, EchoCall’s server does not call OpenRouter directly.\n5. Test with an authorized recipient. Confirm that declining ends the call, pressing 1 starts the agent, interruption works, and the end-call command disconnects.\n\n[ElevenLabs call registration](https://elevenlabs.io/docs/eleven-agents/phone-numbers/twilio-integration/register-call) · [Voice cloning requirements](https://elevenlabs.io/docs/eleven-creative/voices/voice-cloning/instant-voice-cloning)\n",
+      "images": [
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/echocall-genai/main/docs/desktop.png",
+          "alt": "EchoCall listening room in plum, rose, and cream"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/echocall-genai/main/docs/mobile.png",
+          "alt": "Listening room and session controls stacked on mobile"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vams2krish/echocall-genai/main/docs/wide.png",
+          "alt": "Listening room and session controls on a wide display"
+        }
+      ],
+      "liveLinks": [
+        {
+          "url": "https://echocall-genai.vercel.app/",
+          "type": "app",
+          "access": "public",
+          "availability": "available"
+        }
+      ],
+      "screenshotPaths": []
     },
     {
       "name": "FartAlert",
